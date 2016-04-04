@@ -1,0 +1,31 @@
+{
+  "name": "dum.js",
+  "version": "0.0.1",
+  "description": "A stupid simple library for creating components using (almost)purely Javascript",
+  "main": "main.js",
+  "scripts": {
+    "watch": "./node_modules/.bin/webpack-dev-server"
+  },
+  "keywords": [
+  ],
+  "author": "Justin Foss",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "gsap": "^1.18.2"
+  },
+  "devDependencies": {
+    "babel": "^6.3.26",
+    "babel-core": "^6.5.2",
+    "babel-helper-get-function-arity": "^6.5.0",
+    "babel-loader": "^6.2.1",
+    "babel-polyfill": "^6.5.0",
+    "babel-preset-es2015": "^6.3.13",
+    "css-loader": "^0.15.1",
+    "glob": "^7.0.0",
+    "node-libs-browser": "^0.5.2",
+    "style-loader": "^0.12.3",
+    "webpack": "^1.12.11",
+    "webpack-dev-server": "^1.9.0",
+    "which": "^1.2.4"
+  }
+}
