@@ -31,10 +31,8 @@ Object.defineProperties(Router, {
   addRoutes: {
     value: (routeInfo) => {
       routeInfo.forEach((route) => {
-        if(!route.name || !route.path) {
-          throw new Error('Route objects require a name and a path key to be set.');
-        }
-        
+        if(!route.name || !route.path) throw new Error('Route objects require a name and a path key to be set.');
+
         _routes[route.name] = route;
       });
 

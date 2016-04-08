@@ -11,7 +11,7 @@ export function registerComponent(elementName, templateId, shadowHost) {
   let template        = link.import.querySelector(templateId).innerHTML;
   let component       = decorateEl(new CustomElement());
   component.innerHTML = template;
-  
+
   if (shadowHost !== null) {
     let host = document.querySelector(shadowHost);
     let root = host.createShadowRoot();
@@ -26,7 +26,7 @@ export function registerComponent(elementName, templateId, shadowHost) {
 export function createEl(elName) {
   let el          = document.createElement(elName);
   let decoratedEl = decorateEl(el);
-  
+
   return decoratedEl;
 }
 
@@ -34,14 +34,14 @@ export let decorateEl = (function() {
   let uid = 0;
   let mounted = false;
   let eventCallbacks = {};
-  
+
   return (el) => {
     Object.defineProperties(el, {
       $uid: {
         writable: false,
         value: ++uid
       },
-      
+
       $$mounted: {
         value: false,
         enumerable: false,
@@ -49,7 +49,7 @@ export let decorateEl = (function() {
         readable: true,
         configurable: true
       },
-      
+
       $$eventCallbacks: {
         value: {},
         enumerable: false,
@@ -57,33 +57,28 @@ export let decorateEl = (function() {
         readable: true,
         configurable: true
       },
-      
+
       // @todo: Make this use the touchstart event when using mobile
       touchStart: {
-        value: (function(){
-          return _setUpHandler('click', el);
-        }())
+        value: _setUpHandler('click', el)
       },
 
       touchEnd: {
-        value: (function(){
-          return _setUpHandler('touchend', el);
-        }())
+        value: _setUpHandler('touchend', el)
       },
-      
-      
+
       click: {
         value: _setUpHandler('click', el)
       },
-      
+
       to: {
         value: _setUpSingleAnimation(el, 'to')
       },
-      
+
       from: {
         value: _setUpSingleAnimation(el, 'from')
       },
-      
+
       fromTo: {
         value: _setUpGroupAnimation(el)
       },
@@ -91,11 +86,11 @@ export let decorateEl = (function() {
       mouseDown: {
         value: _setUpHandler('mouseDown', el)
       },
-      
+
       mouseUp: {
         value: _setUpHandler('mouseUp', el)
       },
-      
+
       // sets up listeners for component specific events such as lifecycle callbacks
       on: {
         value: (eventName, cb) => {
@@ -109,22 +104,22 @@ export let decorateEl = (function() {
           } else {
             throw new TypeError('Argument must be a function or array of functions');
           }
-          
+
           if(el.$$eventCallbacks[eventName]) {
             el.$$eventCallbacks[eventName] = el.$$eventCallbacks[eventName].concat(cbs);
           } else {
             el.$$eventCallbacks[eventName] = cbs;
           }
-          
+
           return el;
         }
       },
-      
+
       // appends components to current component and calls their 'willMount' lifecycle callbacks
       append: {
         value: (...args) => {
           let fragment = document.createDocumentFragment();
-          
+
           [...args].forEach((childEl) => {
             if(childEl && childEl.constructor === Array){
               childEl.forEach((elem) => {
@@ -133,21 +128,18 @@ export let decorateEl = (function() {
                   fragment.appendChild(elem);
                 }
               });
-              
+
               el.appendChild(fragment);
             } else if(childEl){
-              if(!childEl.$$mounted){
-                traverseNodes(childEl, curry(callNodesEventCallbacks, 'willMount'));
-              }
-
+              if(!childEl.$$mounted) traverseNodes(childEl, curry(callNodesEventCallbacks, 'willMount'));
               el.appendChild(childEl);
             }
           });
-          
+
           return el;
         }
       },
-      
+
       // 'updates' a component by creating a new one with the new 
       // options passed in and replacing the old one in the DOM
       update: {
@@ -162,7 +154,7 @@ export let decorateEl = (function() {
           }
         }
       },
-      
+
       remove: {
         value: () => {
           let parent = el.parentNode;
@@ -171,14 +163,14 @@ export let decorateEl = (function() {
             let removedEl =  parent.removeChild(el);
             traverseNodes(elem, curry(callNodesEventCallbacks, 'didUnMount'));
             el.$$mounted = false;
-            
+
             // Tear down listeners
             Object.keys(eventCallbacks).forEach((key) => {
               eventCallbacks[key].forEach((cb) => {
                 el.removeEventListener(key, cb);
               });
             });
-            
+
             return removedEl;
           } catch(e) {
             console.error(e);
@@ -187,23 +179,21 @@ export let decorateEl = (function() {
           }
         }
       },
-      
+
       setClass: {
         value: (...args) => {
-          if(el.classList){
-            el.classList.add(...args);
-          }
+          if(el.classList) el.classList.add(...args);
           return el;
         }
       },
-      
+
       removeClass: {
         value: (...args) => {
           el.classList.remove(...args);
           return el;
         }
       },
-      
+
       toggleClass: {
         value: (className) => {
           el.classList.toggle(className);
@@ -217,16 +207,16 @@ export let decorateEl = (function() {
           return el;
         }
       },
-      
+
       // sets styles for the element in a stylesheet rather than on the component itself
       // to allow for overwrites via a css file and/or other components
       setStyles: {
         value: (rules) => {
           let compClass = `component-${el.$uid}`;
           el.setClass(compClass);
-          
+
           let styleSheet;
-          
+
           if(document.styleSheets.length){
             styleSheet = document.styleSheets[0];
           } else {
@@ -236,26 +226,26 @@ export let decorateEl = (function() {
           }
 
           var rule = `.${compClass} {\n`;
-          
+
           Object.keys(rules).forEach((key) => {
             let cssKey = key.split(/(?=[A-Z])/).join("-");
             rule += `${cssKey}: ${rules[key]};\n`;
           });
-          
+
           rule += '}';
           styleSheet.insertRule(rule, styleSheet.cssRules.length);
-          
+
           return el;
         }
       },
-      
+
       text: {
         value: (txt) => {
           el.innerText = txt;
           return el;
         }
       },
-      
+
       publish: {
         value: function(eventName, data) {
           let e = createEvent(eventName, data);
@@ -264,7 +254,7 @@ export let decorateEl = (function() {
           return el;
         }
       },
-      
+
       subscribe: {
         value: function(name, cb) {
           window.addEventListener(name, function(e) {
@@ -274,14 +264,14 @@ export let decorateEl = (function() {
           return el;
         }
       },
-      
+
       setSrc: {
         value: (src) => {
           el.src = src;
           return el;
         }
       },
-      
+
       // @todo: Do we need this?
       attachFunction: {
         value: (cb) => {
@@ -289,7 +279,7 @@ export let decorateEl = (function() {
           return el;
         }
       },
-      
+
       // makes the element become a shadow host for native web components
       shadow: {
         value: function(templateId) {
@@ -297,13 +287,13 @@ export let decorateEl = (function() {
           let template = link.import.querySelector(templateId);
           let root     = el.createShadowRoot();
           let clone    = document.importNode(template.content, true);
-          
+
           root.appendChild(clone);
           return el;
         }
       }
     });
-    
+
     return el;
   };
 
@@ -312,10 +302,8 @@ export let decorateEl = (function() {
   ===========================================*/
   function _setUpHandler(name, el) {
     return (cb) => {
-      if (typeof cb !== 'function') {
-        throw new TypeError(`Argument to ${name} must be a function`);
-      }
-      
+      if (typeof cb !== 'function') throw new TypeError(`Argument to ${name} must be a function`);
+
       let domName = `on${name.toLowerCase()}`;
       if(!eventCallbacks[domName]) eventCallbacks[domName] = [];
       eventCallbacks[domName] = eventCallbacks[domName].concat([(cb.bind(el, el))]);
@@ -325,14 +313,14 @@ export let decorateEl = (function() {
           eventCallbacks[key].forEach((cb) => { cb(); }); 
         });
       }
-      
+
       return el;
     };
   }
 
   function _setUpSingleAnimation(el, type) {
     let currentAnimation = {duration: null, vars: null};
-    
+
     return (duration, vars) => {
       if(el.animation && !el.animation._reversed) {
         el.animation.reverse();
@@ -341,7 +329,7 @@ export let decorateEl = (function() {
           writable: false,
           configurable: true
         });
-    
+
       // Ugly logic block ahead!!!
       } else if(
         (el.animation && el.animation._reversed) 
@@ -351,28 +339,27 @@ export let decorateEl = (function() {
         let timeLine = TweenMax[type](el, duration, vars);
         el.animation = timeLine; 
       }
-      
+
       return el;
     }
   }
 
   function _setUpGroupAnimation(el) {
     let currentAnimation = {duration: null, fromVars: null, toVars: null};
-    
+
     return (duration, fromVars, toVars) => {
-      
+
       // Ugly logic block ahead!!!
       if(duration !== currentAnimation.duration 
         || !Object.is(fromVars, currentAnimation.fromVars) 
         || !Object.is(toVars, currentAnimation.toVars)) 
       {
-        
+
         let timeLine = TweenMax.fromTo(el, duration, fromVars, toVars);
-        
-        if (!el.animation) { el.animation = timeLine };  
-        
+
+        if (!el.animation) el.animation = timeLine;
       }
-      
+
       return el;
     }
   }

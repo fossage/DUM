@@ -56,8 +56,5 @@ export let OCM = Component((opts) => {
   );
       
   
-  return x
-    .output(
-      container
-    )
+  return container
 });
