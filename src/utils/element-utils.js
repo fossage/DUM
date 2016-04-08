@@ -19,3 +19,11 @@ export function callNodesEventCallbacks(node, event) {
     });
   }
 }
+
+export function createEvent(eventName, data, options = {}) {
+  return  new CustomEvent(eventName, {
+    detail: { data: data }, 
+    bubbles: options.bubbles || true, 
+    cancelable: options.cancelable || false
+  });
+}

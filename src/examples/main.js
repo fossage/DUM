@@ -1,18 +1,17 @@
 import {DOM} from '../core/elements';
-import {weatherPane} from '../components/weather-pane';
-import {mainControlTiles} from '../components/main-control-tiles';
-import {plexControls} from '../components/plex-controls';
+import {mainNav} from '../components/main-nav';
+import {weatherPane} from '../components/weather-pane'
+import {Router} from '../router/router'
 
 /*======== COMPONENT SETUP =======*/
 
 /*======== LINKAGE =======*/
-DOM.attach(
-  weatherPane,
-  mainControlTiles,
-  plexControls
-)
-.setGlobalStyles({
-  backgroundColor: '#111'
-});
-
+Router.config({root: '/', view: mainNav})
+.addRoutes([
+  {
+    name: 'tiles',
+    path: '/tiles',
+    view: weatherPane
+  }
+]);
 

@@ -1,7 +1,7 @@
 'use strict';
 
 import {curry} from '../utils/functional-utils';
-import {traverseNodes, callNodesEventCallbacks} from '../utils/element-utils'
+import {traverseNodes, callNodesEventCallbacks, createEvent} from '../utils/element-utils'
 
 let TweenMax = require('gsap');
 
@@ -33,6 +33,7 @@ export function createEl(elName) {
 export let decorateEl = (function() {
   let uid = 0;
   let mounted = false;
+  let eventCallbacks = {};
   
   return (el) => {
     Object.defineProperties(el, {
@@ -57,6 +58,7 @@ export let decorateEl = (function() {
         configurable: true
       },
       
+      // @todo: Make this use the touchstart event when using mobile
       touchStart: {
         value: (function(){
           return _setUpHandler('click', el);
@@ -165,7 +167,19 @@ export let decorateEl = (function() {
         value: () => {
           let parent = el.parentNode;
           try {
-            return parent.removeChild(el);
+            traverseNodes(el, curry(callNodesEventCallbacks, 'willUnMount'));
+            let removedEl =  parent.removeChild(el);
+            traverseNodes(elem, curry(callNodesEventCallbacks, 'didUnMount'));
+            el.$$mounted = false;
+            
+            // Tear down listeners
+            Object.keys(eventCallbacks).forEach((key) => {
+              eventCallbacks[key].forEach((cb) => {
+                el.removeEventListener(key, cb);
+              });
+            });
+            
+            return removedEl;
           } catch(e) {
             console.error(e);
             console.warn('Cant remove element because no parent was found');
@@ -244,7 +258,7 @@ export let decorateEl = (function() {
       
       publish: {
         value: function(eventName, data) {
-          let e = new CustomEvent(eventName, {detail: {data: data}, bubbles: true, cancelable: false});
+          let e = createEvent(eventName, data);
           el.dispatchEvent(e);
           
           return el;
@@ -268,6 +282,7 @@ export let decorateEl = (function() {
         }
       },
       
+      // @todo: Do we need this?
       attachFunction: {
         value: (cb) => {
           cb.call(el, el);
@@ -291,73 +306,74 @@ export let decorateEl = (function() {
     
     return el;
   };
+
+  /*===========================================
+              PRIVATE FUNCTIONS 
+  ===========================================*/
+  function _setUpHandler(name, el) {
+    return (cb) => {
+      if (typeof cb !== 'function') {
+        throw new TypeError(`Argument to ${name} must be a function`);
+      }
+      
+      let domName = `on${name.toLowerCase()}`;
+      if(!eventCallbacks[domName]) eventCallbacks[domName] = [];
+      eventCallbacks[domName] = eventCallbacks[domName].concat([(cb.bind(el, el))]);
+
+      el[domName] = () => {
+        Object.keys(eventCallbacks).forEach((key) => { 
+          eventCallbacks[key].forEach((cb) => { cb(); }); 
+        });
+      }
+      
+      return el;
+    };
+  }
+
+  function _setUpSingleAnimation(el, type) {
+    let currentAnimation = {duration: null, vars: null};
+    
+    return (duration, vars) => {
+      if(el.animation && !el.animation._reversed) {
+        el.animation.reverse();
+        Object.assign(el, 'to', {
+          value: TweenMax[type].bind(TweenMax, el, duration, vars),
+          writable: false,
+          configurable: true
+        });
+    
+      // Ugly logic block ahead!!!
+      } else if(
+        (el.animation && el.animation._reversed) 
+        || duration !== currentAnimation.duration 
+        || !Object.is(vars, currentAnimation.vars)) {
+
+        let timeLine = TweenMax[type](el, duration, vars);
+        el.animation = timeLine; 
+      }
+      
+      return el;
+    }
+  }
+
+  function _setUpGroupAnimation(el) {
+    let currentAnimation = {duration: null, fromVars: null, toVars: null};
+    
+    return (duration, fromVars, toVars) => {
+      
+      // Ugly logic block ahead!!!
+      if(duration !== currentAnimation.duration 
+        || !Object.is(fromVars, currentAnimation.fromVars) 
+        || !Object.is(toVars, currentAnimation.toVars)) 
+      {
+        
+        let timeLine = TweenMax.fromTo(el, duration, fromVars, toVars);
+        
+        if (!el.animation) { el.animation = timeLine };  
+        
+      }
+      
+      return el;
+    }
+  }
 }());
-
-
-/*===========================================
-             PRIVATE FUNCTIONS 
-===========================================*/
-function _setUpHandler(name, el) {
-  let callbacks = [];
-  return (cb) => {
-    if (typeof cb !== 'function') {
-      throw new TypeError(`Argument to ${name} must be a function`);
-    }
-    
-    let domName = `on${name.toLowerCase()}`;
-    callbacks = callbacks.concat([(cb.bind(el, el))]);
-
-    el[domName] = () => {
-      callbacks.forEach((cb) => { cb(); });
-    }
-    
-    return el;
-  };
-}
-
-function _setUpSingleAnimation(el, type) {
-  let currentAnimation = {duration: null, vars: null};
-  
-  return (duration, vars) => {
-    if(el.animation && !el.animation._reversed) {
-      el.animation.reverse();
-      Object.assign(el, 'to', {
-        value: TweenMax[type].bind(TweenMax, el, duration, vars),
-        writable: false,
-        configurable: true
-      });
-   
-    // Ugly logic block ahead!!!
-    } else if(
-      (el.animation && el.animation._reversed) 
-      || duration !== currentAnimation.duration 
-      || !Object.is(vars, currentAnimation.vars)) {
-
-      let timeLine = TweenMax[type](el, duration, vars);
-      el.animation = timeLine; 
-    }
-    
-    return el;
-  }
-}
-
-function _setUpGroupAnimation(el) {
-  let currentAnimation = {duration: null, fromVars: null, toVars: null};
-  
-  return (duration, fromVars, toVars) => {
-    
-    // Ugly logic block ahead!!!
-    if(duration !== currentAnimation.duration 
-      || !Object.is(fromVars, currentAnimation.fromVars) 
-      || !Object.is(toVars, currentAnimation.toVars)) 
-    {
-      
-      let timeLine = TweenMax.fromTo(el, duration, fromVars, toVars);
-      
-      if (!el.animation) { el.animation = timeLine };  
-      
-    }
-    
-    return el;
-  }
-}

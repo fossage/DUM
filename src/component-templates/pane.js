@@ -18,7 +18,7 @@ export let Pane = Component((opts) => {
     zIndex: '10',
     margin: '0',
     position: 'absolute',
-    top: '-235px'
+    top: '200px'
   }, opts);
   
   let wrapper = DOM

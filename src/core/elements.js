@@ -5,12 +5,12 @@ import {curry} from '../utils/functional-utils';
 import {traverseNodes, callNodesEventCallbacks} from '../utils/element-utils'
 
 export let DOM = {};
+decorateEl(document.body);
 
 Object.defineProperties(DOM, {
   attach: {
     // main method to attatch DOM fragments to the actual DOM
     value: (...args) => {
-      decorateEl(document.body);
       let fragment = decorateEl(document.createDocumentFragment());
       
       [...args].forEach((arg) => {
