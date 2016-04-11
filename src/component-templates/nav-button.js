@@ -14,8 +14,6 @@ export let NavButton = Component((opts) => {
   return DOM
     .button
     .text(opts.text)
-    .click((el) => {
-      Router.goTo('tiles')
-    })
+    .click(opts.click)
     .setStyles(styles);
 });

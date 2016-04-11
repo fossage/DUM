@@ -161,7 +161,7 @@ export let decorateEl = (function() {
           try {
             traverseNodes(el, curry(callNodesEventCallbacks, 'willUnMount'));
             let removedEl =  parent.removeChild(el);
-            traverseNodes(elem, curry(callNodesEventCallbacks, 'didUnMount'));
+            traverseNodes(el, curry(callNodesEventCallbacks, 'didUnMount'));
             el.$$mounted = false;
 
             // Tear down listeners
@@ -302,15 +302,16 @@ export let decorateEl = (function() {
   ===========================================*/
   function _setUpHandler(name, el) {
     return (cb) => {
+      if(!cb) return el;
       if (typeof cb !== 'function') throw new TypeError(`Argument to ${name} must be a function`);
 
       let domName = `on${name.toLowerCase()}`;
-      if(!eventCallbacks[domName]) eventCallbacks[domName] = [];
-      eventCallbacks[domName] = eventCallbacks[domName].concat([(cb.bind(el, el))]);
+      if(!el.$$eventCallbacks[domName]) el.$$eventCallbacks[domName] = [];
+      el.$$eventCallbacks[domName] = el.$$eventCallbacks[domName].concat([(cb.bind(el, el))]);
 
       el[domName] = () => {
-        Object.keys(eventCallbacks).forEach((key) => { 
-          eventCallbacks[key].forEach((cb) => { cb(); }); 
+        el.$$eventCallbacks[domName].forEach((cb) => {
+          cb();
         });
       }
 

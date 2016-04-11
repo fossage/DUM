@@ -1,17 +1,18 @@
 import {NavButton} from '../component-templates/nav-button';
-import {DOM} from '../core/elements'
+import {DOM} from '../core/elements';
+import {Router} from '../router/router';
 
 export let mainNav = setUpNav();
 
 function setUpNav(){
   let navOptions = [
-    { text: 'Todo List' },
-    { text: 'Calendar' },
+    { text: 'Todo List', click: () => { Router.goTo('tiles'); }},
+    { text: 'Calendar' , click: () => { Router.goTo('reddit'); }},
     { text: 'Reddit Clone' }
   ];
   
   let navButtons = NavButton(navOptions);
-  
+
   let navBar = DOM
     .div
     .setStyles({ 
