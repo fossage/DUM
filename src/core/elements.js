@@ -354,7 +354,27 @@ Object.defineProperties(DOM, {
   },
 
   input: {
-    get: () => createEl('input')
+    get: () => {
+      let input = createEl('input');
+      
+      input.placeHolder = (val) => {
+        input.setAttribute('placeholder', val);
+        return input;
+      }
+      
+      input.setType = (val) => {
+        input.setAttribute('type', val);
+        return input;
+      }
+      
+      input.val = (val) => {
+        if(typeof val === 'undefined') return input.value;
+        input.value = val;
+        return input;
+      }
+      
+      return input;
+    }
   },
 
   keygen: {

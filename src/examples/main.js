@@ -1,6 +1,6 @@
 import {DOM} from '../core/elements';
 import {mainNav} from '../components/main-nav';
-import {weatherPane} from '../components/weather-pane';
+import {todoList} from '../components/todo-list';
 import {test} from '../components/test'
 import {Router} from '../router/router';
 
@@ -12,7 +12,7 @@ Router.config({root: '/', view: mainNav})
   {
     name: 'tiles',
     path: '/tiles',
-    view: weatherPane
+    view: todoList
   },
   {
     name: 'reddit',
