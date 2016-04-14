@@ -1,8 +1,6 @@
 import {DOM} from '../core/elements';
 
-export let todoList = setUpTodoList();
-
-function setUpTodoList(){
+export let todoList = () => {
   let wrapper = DOM
     .div
     .setStyles({
@@ -50,6 +48,7 @@ function setUpTodoList(){
       .text('Add Item')
       .click(() => {
         let val = input.val();
+        if(!val) return false;
         input.val(null);
         list.append(DOM.li.text(val));
       })

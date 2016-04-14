@@ -10,8 +10,8 @@ import {Router} from '../router/router';
 Router.config({root: '/', view: mainNav})
 .addRoutes([
   {
-    name: 'tiles',
-    path: '/tiles',
+    name: 'todo',
+    path: '/todo',
     view: todoList
   },
   {

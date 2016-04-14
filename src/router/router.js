@@ -29,10 +29,11 @@ Object.defineProperties(Router, {
     value: (opts) => {
       if(!opts.view) throw new Error('Router requires a default view');
       Object.assign(Router._config, opts);
-      _rootView = opts.view;
+      let view = opts.view();
+      _rootView = view;
       _routes.root = { name: 'root', path: Router.root };
       _currentState = _routes.current = _routes.root;
-      DOM.attach(opts.view);
+      DOM.attach(view);
       
       return Router;
     },
@@ -52,16 +53,18 @@ Object.defineProperties(Router, {
   goTo: {
     value: (routeName) => {
       let state = _routes[routeName];
+      state.$$instanceView = state.view();
+
       if(state.path === _currentState.path) return Router;
       
       let stateStart = createEvent('stateChangeStart', _routes.current);
       window.dispatchEvent(stateStart);
+      
+      let parent = state.$$instanceView.parentNode || _rootView;
+      let appendMethod = state.$$instanceView.parentNode ? 'append' : 'appendChild';
 
-      let parent = state.view.parentNode || _rootView;
-      let appendMethod = state.view.parentNode ? 'append' : 'appendChild';
-
-      if(_currentState.view && _currentState.view.remove) _currentState.view.remove();
-      if(state.view) parent[appendMethod](state.view);
+      if(_currentState.$$instanceView && _currentState.$$instanceView.remove) _currentState.$$instanceView.remove();
+      if(state.$$instanceView) parent[appendMethod](state.$$instanceView);
 
       history.pushState({name: state.name, path: state.path}, state.name || '', state.path);
       _currentState = state;

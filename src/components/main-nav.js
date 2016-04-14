@@ -2,11 +2,9 @@ import {NavButton} from '../component-templates/nav-button';
 import {DOM} from '../core/elements';
 import {Router} from '../router/router';
 
-export let mainNav = setUpNav();
-
-function setUpNav(){
+export let mainNav = () => {
   let navOptions = [
-    { text: 'Todo List', click: () => { Router.goTo('tiles'); }},
+    { text: 'Todo List', click: () => { Router.goTo('todo'); }},
     { text: 'Reddit' , click: () => { Router.goTo('reddit'); }},
     { text: 'Calendar' }
   ];
