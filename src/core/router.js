@@ -13,7 +13,10 @@ window.addEventListener('popstate', (e) => {
   let state = e.state || _routes.root;
   _prevState = _currentState;
   _routes[_prevState.name].$$instanceView.remove();
-  let iView = _routes[state.name].view ? _routes[state.name].view() : null;
+  
+  // the null in the ternary is a hack fix for a bug when navigating back to the root view.
+  // Root view should be implemented as a singlton. Easy fix, just haven't done it yet
+  let iView = _routes[state.name].view ? _routes[state.name].view() : _rootView;
   _rootView.append(iView);
   _currentState = _routes[state.name] || Router._config.root;
   _currentState.$$instanceView = iView;
@@ -31,12 +34,11 @@ Object.defineProperties(Router, {
     value: (opts) => {
       if(!opts.view) throw new Error('Router requires a default view');
       Object.assign(Router._config, opts);
-      let view = opts.view();
-      _rootView = view;
+      _rootView = opts.view();;
       _routes.root = { name: 'root', path: Router.root };
       _currentState = _routes.current = _routes.root;
-      DOM.attach(view);
-      
+      DOM.attach(_rootView);
+
       return Router;
     },
   },
@@ -57,9 +59,7 @@ Object.defineProperties(Router, {
       let state = _routes[routeName];
       if(state.path === _currentState.path) return Router;
       state.$$instanceView = state.view();
-      
-      state.$$instanceView = state.view();
-      
+
       let stateStart = createEvent('stateChangeStart', _routes.current);
       window.dispatchEvent(stateStart);
       

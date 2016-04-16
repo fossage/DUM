@@ -3,55 +3,48 @@ import {DOM} from '../core/elements';
 export let todoList = () => {
   let wrapper = DOM
     .div
-    .setStyles({
-      maxWidth: '500px',
-      border: '1px solid #888',
-      borderRadius: '4px',
-      padding: '5px'
-    });
+    .setClass('card')
+    .setStyles({maxWidth: '600px', margin: '0 auto'})
     
   let input = DOM
     .input
     .setStyles({
-      flex: '1',
+      width: '90% !important',
       height: '20px',
       position: 'relative',
       top: '20px'
-    });
+    })
+    .setClass('input-field')
+    .setType('text');
     
-  let list = DOM.ul
-    
-  let header = DOM
-    .header
-    .setStyles({display: 'flex'})
+  let button = DOM
+    .a
+    .setStyles({ 
+      position: 'relative',
+      top: '18px'
+    })
+    .setClass('btn', 'btn-floating', 'waves-effect', 'waves-light', 'cyan')
+    .click(() => {
+      let val = input.val();
+      if(!val) return false;
+      input.val(null);
+      list.append(DOM.li.text(val).setClass('collection-item'));
+    })
     .append(
-      
       DOM
-      .h2
-      .text('ToDo List')
-      .setStyles({flex: '1'}),
-      
-      input,
-      
-      DOM
-      .button
-      .setStyles({ 
-        flex: '0.5',
-        position: 'relative',
-        top: '18px',
-        height: '30px',
-        marginLeft: '5px',
-        padding: '3px',
-        borderRadius: '3px'
-      })
-      .text('Add Item')
-      .click(() => {
-        let val = input.val();
-        if(!val) return false;
-        input.val(null);
-        list.append(DOM.li.text(val));
-      })
+      .i
+      .setClass('material-icons')
+      .text('add')
     );
     
-  return wrapper.append(header, list);
+  let list = DOM
+    .ul
+    .setClass('collection', 'with-header')
+    .append(
+      DOM.li.setClass('collection-header')
+      .append(DOM.h4.text('ToDo List').setStyles({textAlign: 'center'}))
+    )
+    .append(DOM.li.setClass('collection-item').append(input, button))
+    
+  return wrapper.append(list);
 }

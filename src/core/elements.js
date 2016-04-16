@@ -21,7 +21,7 @@ Object.defineProperties(DOM, {
         }
       });
       
-      document.body.appendChild(fragment);
+      let element = document.body.appendChild(fragment);
       
       // here we call any 'didMount' lifecycle callbacks for each element being attached
       [...args].forEach((arg) => {
@@ -37,7 +37,7 @@ Object.defineProperties(DOM, {
         }
       });
       
-      return DOM;
+      return element;
     }
   },
   

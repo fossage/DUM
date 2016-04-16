@@ -3,31 +3,31 @@ import {DOM} from '../core/elements';
 import {Router} from '../core/router';
 
 export let mainNav = () => {
-  let navOptions = [
-    { text: 'Todo List', click: () => { Router.goTo('todo');}},
-    { text: 'Reddit' , click: () => { Router.goTo('reddit'); }},
-    { text: 'Calendar' }
-  ];
   
-  let navButtons = NavButton(navOptions);
-  navButtons.children[0].setClass('btn', 'btn-large')
+  function navItem(route, text) {
+    return DOM
+    .li
+    .click(() => Router.goTo(route))
+    .append(DOM.a.text(text));
+  }
 
-  let navBar = DOM
-    .div
-    .setStyles({paddingTop: '70px'})
+  let navBar = DOM.div
+  .append(
+    DOM.nav
     .append(
       
       DOM
       .div
-      .setStyles({ 
-        width: '100%', 
-        padding: '5px',
-        margin: '10px 5px 0 5px',
-        borderBottom: '2px solid #aaa',
-        position: 'fixed',
-        top: '0'
-      })
-      .append(navButtons));
+      .setClass('nav-wrapper', 'cyan', 'darken-1')
+      .append(
+        DOM.a.setClass('brand-logo', 'left').text('DUM.js'),
+        DOM.ul.setClass('right')
+        .append(
+          navItem('todo', 'Todo List'),
+          navItem('reddit', 'Reddit'),
+          navItem('/', 'Calendar')
+        )
+    )));
     
     return navBar;
 }

@@ -157,7 +157,7 @@ export let decorateEl = (function() {
       remove: {
         value: () => {
           let parent = el.parentNode;
-          if(!parent){ debugger }
+
           try {
             traverseNodes(el, curry(callNodesEventCallbacks, 'willUnMount'));
             let removedEl =  parent.removeChild(el);
