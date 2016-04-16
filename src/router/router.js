@@ -12,9 +12,11 @@ let _rootView = null;
 window.addEventListener('popstate', (e) => {
   let state = e.state || _routes.root;
   _prevState = _currentState;
-  _routes[_prevState.name].view.remove();
-  _rootView.append(_routes[state.name].view);
+  _routes[_prevState.name].$$instanceView.remove();
+  let iView = _routes[state.name].view();
+  _rootView.append(iView);
   _currentState = _routes[state.name] || Router._config.root;
+  _currentState.$$instanceView = iView;
 });
 
 Object.defineProperties(Router, {
@@ -53,9 +55,8 @@ Object.defineProperties(Router, {
   goTo: {
     value: (routeName) => {
       let state = _routes[routeName];
-      state.$$instanceView = state.view();
-
       if(state.path === _currentState.path) return Router;
+      state.$$instanceView = state.view();
       
       let stateStart = createEvent('stateChangeStart', _routes.current);
       window.dispatchEvent(stateStart);
