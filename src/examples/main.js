@@ -2,7 +2,7 @@ import {DOM} from '../core/elements';
 import {mainNav} from '../components/main-nav';
 import {todoList} from '../components/todo-list';
 import {test} from '../components/test'
-import {Router} from '../router/router';
+import {Router} from '../core/router';
 
 /*======== COMPONENT SETUP =======*/
 

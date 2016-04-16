@@ -19,8 +19,7 @@ export let todoList = () => {
       top: '20px'
     });
     
-  let list = DOM
-    .ul
+  let list = DOM.ul
     
   let header = DOM
     .header

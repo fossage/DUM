@@ -1,6 +1,6 @@
 # DUM.js
 
-**A stupid simple library for creating web components using purely Javascript**
+**Dynamic Update Manager - A stupid simple library for creating web components using purely Javascript**
 
 @todo: finish README!
 

@@ -58,6 +58,8 @@ Object.defineProperties(Router, {
       if(state.path === _currentState.path) return Router;
       state.$$instanceView = state.view();
       
+      state.$$instanceView = state.view();
+      
       let stateStart = createEvent('stateChangeStart', _routes.current);
       window.dispatchEvent(stateStart);
       
