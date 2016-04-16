@@ -13,7 +13,7 @@ window.addEventListener('popstate', (e) => {
   let state = e.state || _routes.root;
   _prevState = _currentState;
   _routes[_prevState.name].$$instanceView.remove();
-  let iView = _routes[state.name].view();
+  let iView = _routes[state.name].view ? _routes[state.name].view() : null;
   _rootView.append(iView);
   _currentState = _routes[state.name] || Router._config.root;
   _currentState.$$instanceView = iView;

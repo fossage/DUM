@@ -165,8 +165,8 @@ export let decorateEl = (function() {
             el.$$mounted = false;
 
             // Tear down listeners
-            Object.keys(eventCallbacks).forEach((key) => {
-              eventCallbacks[key].forEach((cb) => {
+            Object.keys(el.$$eventCallbacks).forEach((key) => {
+              el.$$eventCallbacks[key].forEach((cb) => {
                 el.removeEventListener(key, cb);
               });
             });
