@@ -32,10 +32,9 @@ export function createEl(elName) {
 
 export let decorateEl = (function() {
   let uid = 0;
-  let mounted = false;
-  let eventCallbacks = {};
 
   return (el) => {
+
     Object.defineProperties(el, {
       $uid: {
         writable: false,

@@ -1,6 +1,6 @@
 import {DOM} from '../core/elements';
 import {Component} from '../core/component-factory';
-import {Router} from '../router/router'
+import {Router} from '../core/router'
 
 export let NavButton = Component((opts) => {
  

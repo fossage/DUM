@@ -53,9 +53,9 @@ Object.defineProperties(Router, {
   goTo: {
     value: (routeName) => {
       let state = _routes[routeName];
-      state.$$instanceView = state.view();
-
       if(state.path === _currentState.path) return Router;
+      
+      state.$$instanceView = state.view();
       
       let stateStart = createEvent('stateChangeStart', _routes.current);
       window.dispatchEvent(stateStart);

@@ -1,15 +1,16 @@
 import {NavButton} from '../component-templates/nav-button';
 import {DOM} from '../core/elements';
-import {Router} from '../router/router';
+import {Router} from '../core/router';
 
 export let mainNav = () => {
   let navOptions = [
-    { text: 'Todo List', click: () => { Router.goTo('todo'); }},
+    { text: 'Todo List', click: () => { Router.goTo('todo');}},
     { text: 'Reddit' , click: () => { Router.goTo('reddit'); }},
     { text: 'Calendar' }
   ];
   
   let navButtons = NavButton(navOptions);
+  navButtons.children[0].setClass('btn', 'btn-large')
 
   let navBar = DOM
     .div
