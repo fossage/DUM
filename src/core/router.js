@@ -10,33 +10,38 @@ let _prevState = null;
 let _rootView = null;
 
 window.addEventListener('popstate', (e) => {
-  let state = e.state || _routes.root;
+  let state = e.state || Router.$$config.root;
   _prevState = _currentState;
-  _routes[_prevState.name].$$instanceView.remove();
   
-  // the null in the ternary is a hack fix for a bug when navigating back to the root view.
-  // Root view should be implemented as a singlton. Easy fix, just haven't done it yet
-  let iView = _routes[state.name].view ? _routes[state.name].view() : _rootView;
-  _rootView.append(iView);
-  _currentState = _routes[state.name] || Router._config.root;
-  _currentState.$$instanceView = iView;
+  if(_prevState.name !== 'root') _routes[_prevState.name].$$instanceView.remove();
+  
+  if(state.name !== 'root') {
+    let iView = _routes[state.name].view();
+    _currentState = _routes[state.name]
+    _currentState.$$instanceView = iView;
+    _rootView.append(iView);
+  } else {
+     _currentState = Router.$$config.root;
+  }
 });
 
 Object.defineProperties(Router, {
-  _config: {
+  $$config: {
     value: {
-      root: '/',
-      view: null
+      root: {
+        name: 'root',
+        path: '/',
+        view: null
+      }
     }
   },
 
   config: {
     value: (opts) => {
-      if(!opts.view) throw new Error('Router requires a default view');
-      Object.assign(Router._config, opts);
-      _rootView = opts.view();;
-      _routes.root = { name: 'root', path: Router.root };
-      _currentState = _routes.current = _routes.root;
+      if(!opts.root && opts.root.view) throw new Error('Router requires a root configuration object with a root view');
+      Object.assign(Router.$$config, opts);
+      _rootView = opts.root.view();
+      _currentState = _routes.root = Router.$$config.root;
       DOM.attach(_rootView);
 
       return Router;
@@ -60,7 +65,7 @@ Object.defineProperties(Router, {
       if(state.path === _currentState.path) return Router;
       state.$$instanceView = state.view();
 
-      let stateStart = createEvent('stateChangeStart', _routes.current);
+      let stateStart = createEvent('stateChangeStart', _currentState);
       window.dispatchEvent(stateStart);
       
       let parent = state.$$instanceView.parentNode || _rootView;

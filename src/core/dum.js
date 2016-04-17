@@ -215,15 +215,9 @@ export let decorateEl = (function() {
           let compClass = `component-${el.$uid}`;
           el.setClass(compClass);
 
-          let styleSheet;
-
-          if(document.styleSheets.length){
-            styleSheet = document.styleSheets[0];
-          } else {
-            var styleEl = document.createElement('style');
-            document.head.appendChild(styleEl); 
-            styleSheet = styleEl.sheet;
-          }
+          var styleEl = document.createElement('style');
+          document.head.appendChild(styleEl); 
+          let styleSheet = styleEl.sheet;
 
           var rule = `.${compClass} {\n`;
 
@@ -233,7 +227,9 @@ export let decorateEl = (function() {
           });
 
           rule += '}';
-          styleSheet.insertRule(rule, styleSheet.cssRules.length);
+
+          let index = styleSheet.cssRules ? styleSheet.cssRules.length : 0;
+          styleSheet.insertRule(rule, index);
 
           return el;
         }
