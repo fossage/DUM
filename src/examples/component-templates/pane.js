@@ -1,8 +1,8 @@
 'use strict'
 
-import {DOM} from '../core/elements';
-import {pxParser} from '../utils/string-utils';
-import {Component} from '../core/component-factory';
+import {DUM} from '../../dum-core/dum';
+import {pxParser} from '../../dum-core/utils/string';
+import {Component} from '../../dum-core/factories/component';
 
 let TweenMax = require('gsap');
 
@@ -21,7 +21,7 @@ export let Pane = Component((opts) => {
     top: '200px'
   }, opts);
   
-  let wrapper = DOM
+  let wrapper = DUM
     .div
     .setStyles(styles)
     .touchStart((el) => {
@@ -29,7 +29,7 @@ export let Pane = Component((opts) => {
       el.publish('closePane', {});
     });
     
-  let heading = DOM.h1;
+  let heading = DUM.h1;
   
   wrapper.append(heading);
   

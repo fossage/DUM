@@ -1,10 +1,10 @@
-import {DOM} from '../core/elements';
+import {DUM} from '../../dum-core/dum';
 
 export let test = () => {
- return DOM
+ return DUM
   .div
   .append(
-    DOM
+    DUM
     .h1
     .text('TEST')
   );

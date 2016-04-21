@@ -1,0 +1,2 @@
+import {DUM} from './dum';
+

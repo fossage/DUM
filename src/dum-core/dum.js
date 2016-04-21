@@ -1,11 +1,15 @@
 'use strict';
-
-import {curry} from '../utils/functional-utils';
-import {traverseNodes, callNodesEventCallbacks, createEvent} from '../utils/element-utils'
-
+/*=======================================
+            IMPORTS/EXPORTS
+=======================================*/
+import {curry} from './utils/functional';
+import {traverseNodes, callNodesEventCallbacks, createEvent} from './utils/element'
 let TweenMax = require('gsap');
 
-export function registerComponent(elementName, templateId, shadowHost) {
+/*=======================================
+            METHOD DEFINITIONS
+=======================================*/
+function registerComponent(elementName, templateId, shadowHost) {
   let CustomElement   = document.registerElement(elementName);
   let link            = document.querySelector(`link[rel="import"]${templateId}-comp`);
   let template        = link.import.querySelector(templateId).innerHTML;
@@ -23,14 +27,14 @@ export function registerComponent(elementName, templateId, shadowHost) {
   return component;
 }
 
-export function createEl(elName) {
+function createEl(elName) {
   let el          = document.createElement(elName);
   let decoratedEl = decorateEl(el);
 
   return decoratedEl;
 }
 
-export let decorateEl = (function() {
+let decorateEl = (function() {
   let uid = 0;
 
   return (el) => {
@@ -361,3 +365,23 @@ export let decorateEl = (function() {
     }
   }
 }());
+
+export let DUM = {};
+
+/*=======================================
+         METHOD/PROPS ASSIGNMENT
+=======================================*/
+
+Object.defineProperties(DUM, {
+  registerComponent: {
+    value: registerComponent
+  },
+  
+  createEl: {
+    value: createEl
+  },
+  
+  decorateEl: {
+    value: decorateEl
+  }
+});

@@ -1,8 +1,8 @@
 'use strict';
-import {createEvent} from '../utils/element-utils';
-import {DOM} from '../core/elements';
+import {createEvent} from './utils/element';
+import {DUM} from './dum';
 
-export let Router = {};
+DUM.Router = {};
 
 let _routes = {};
 let _currentState = null;
@@ -10,7 +10,7 @@ let _prevState = null;
 let _rootView = null;
 
 window.addEventListener('popstate', (e) => {
-  let state = e.state || Router.$$config.root;
+  let state = e.state || DUM.Router.$$config.root;
   _prevState = _currentState;
   
   if(_prevState.name !== 'root') _routes[_prevState.name].$$instanceView.remove();
@@ -21,11 +21,11 @@ window.addEventListener('popstate', (e) => {
     _currentState.$$instanceView = iView;
     _rootView.append(iView);
   } else {
-     _currentState = Router.$$config.root;
+     _currentState = DUM.Router.$$config.root;
   }
 });
 
-Object.defineProperties(Router, {
+Object.defineProperties(DUM.Router, {
   $$config: {
     value: {
       root: {
@@ -39,12 +39,12 @@ Object.defineProperties(Router, {
   config: {
     value: (opts) => {
       if(!opts.root && opts.root.view) throw new Error('Router requires a root configuration object with a root view');
-      Object.assign(Router.$$config, opts);
+      Object.assign(DUM.Router.$$config, opts);
       _rootView = opts.root.view();
-      _currentState = _routes.root = Router.$$config.root;
-      DOM.attach(_rootView);
+      _currentState = _routes.root = DUM.Router.$$config.root;
+      DUM.attach(_rootView);
 
-      return Router;
+      return DUM.Router;
     },
   },
   
@@ -55,14 +55,14 @@ Object.defineProperties(Router, {
         _routes[route.name] = route;
       });
 
-      return Router;
+      return DUM.Router;
     }
   },
   
   goTo: {
     value: (routeName) => {
       let state = _routes[routeName];
-      if(state.path === _currentState.path) return Router;
+      if(state.path === _currentState.path) return DUM.Router;
       state.$$instanceView = state.view();
 
       let stateStart = createEvent('stateChangeStart', _currentState);
@@ -80,7 +80,7 @@ Object.defineProperties(Router, {
       let stateEnd = createEvent('stateChangeEnd', state);
       window.dispatchEvent(stateEnd);
       
-      return Router;
+      return DUM.Router;
     }
   }
 });

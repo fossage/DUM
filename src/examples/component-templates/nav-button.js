@@ -1,11 +1,10 @@
-import {DOM} from '../core/elements';
-import {Component} from '../core/component-factory';
-import {Router} from '../core/router'
+import {DUM} from '../../dum-core/dum';
+import {Component} from '../../dum-core/factories/component';
 
 export let NavButton = Component((opts) => { 
   let styles = Object.assign({margin: '4px'}, opts.styles);
   
-  let btn = DOM
+  let btn = DUM
     .button
     .text(opts.text)
     .click(opts.click)

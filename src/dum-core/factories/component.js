@@ -1,7 +1,5 @@
 'use strict';
 
-import {decorateEl} from './dum';
-
 export let Component = (defaultConstructor) => {
   return (opts) => { 
     if(typeof opts === 'undefined') {

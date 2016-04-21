@@ -1,27 +1,27 @@
+import {DUM} from '../../dum-core/dum';
+import {HTTP} from '../../services/http';
 import {NavButton} from '../component-templates/nav-button';
-import {DOM} from '../core/elements';
-import {Router} from '../core/router';
 
 export let mainNav = () => {
   
   function navItem(route, text) {
-    return DOM
+    return DUM
     .li
-    .click(() => Router.goTo(route))
-    .append(DOM.a.text(text));
+    .click(() => DUM.Router.goTo(route))
+    .append(DUM.a.text(text));
   }
 
-  let navBar = DOM.div
+  let navBar = DUM.div
   .append(
-    DOM.nav
+    DUM.nav
     .append(
       
-      DOM
+      DUM
       .div
       .setClass('nav-wrapper', 'cyan', 'darken-1')
       .append(
-        DOM.a.setClass('brand-logo', 'left').text('DUM.js'),
-        DOM.ul.setClass('right')
+        DUM.a.setClass('brand-logo', 'left').text('DUM.js'),
+        DUM.ul.setClass('right')
         .append(
           navItem('todo', 'Todo List'),
           navItem('reddit', 'Reddit'),

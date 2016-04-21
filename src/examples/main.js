@@ -1,14 +1,13 @@
-import {DOM} from '../core/elements';
-import {mainNav} from '../components/main-nav';
-import {todoList} from '../components/todo-list';
-import {test} from '../components/test'
-import {Router} from '../core/router';
+import {mainNav} from './components/main-nav';
+import {todoList} from './components/todo-list';
+import {test} from './components/test';
+import {DUM} from '../dum-core/dum';
 
 require('../styles/main.scss');
 /*======== COMPONENT SETUP =======*/
 
 /*======== LINKAGE =======*/
-Router
+DUM.Router
 .config({
   root: { 
     name: 'root',
