@@ -1,5 +1,5 @@
 import {DUM} from '../../dum-core/dum';
-import {HTTP} from '../../services/http';
+import {HTTP} from '../services/http';
 import {NavButton} from '../component-templates/nav-button';
 
 export let mainNav = () => {

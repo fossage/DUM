@@ -1,6 +1,6 @@
 'use strict';
 
-import {DUM} from '../dum-core/dum';
+import {DUM} from '../../dum-core/dum';
 let http = {};
 
 export let HTTP = DUM.service('HTTP', http);
