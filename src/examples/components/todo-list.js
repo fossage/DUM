@@ -1,5 +1,5 @@
 import {DUM} from '../../dum-core/dum';
-export let deepstream = require('../../node_modules/deepstream.io-client-js/src/client.js');
+export let deepstream = require('../../../node_modules/deepstream.io-client-js/src/client.js');
 export let ds = deepstream( 'localhost:6020' ).login();
 export let record = ds.record.getRecord( 'someUser' );
 

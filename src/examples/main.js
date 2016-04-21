@@ -3,7 +3,7 @@ import {todoList} from './components/todo-list';
 import {test} from './components/test';
 import {DUM} from '../dum-core/dum';
 
-require('../styles/main.scss');
+require('./styles/main.scss');
 /*======== COMPONENT SETUP =======*/
 
 /*======== LINKAGE =======*/

@@ -9,6 +9,8 @@ let TweenMax = require('gsap');
 /*=======================================
             METHOD DEFINITIONS
 =======================================*/
+// @todo - Figure out a nice way to attach this to the DUM namespace, or ditch it
+// entirely becaues using html goes against the grain of the framework
 function registerComponent(elementName, templateId, shadowHost) {
   let CustomElement   = document.registerElement(elementName);
   let link            = document.querySelector(`link[rel="import"]${templateId}-comp`);
