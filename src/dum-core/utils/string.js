@@ -19,3 +19,29 @@ export let getParamNames = (function(){
     return result;
   }
 }());
+
+export function assembleUrl(url, params, queryParams) {
+  let splitPath = url.split('/');
+  let paramKeys = Object.keys(params);
+  let qp = '';
+
+  splitPath.forEach((pathSection, idx) => {
+    paramKeys.forEach((key) => {
+      if (':' + key === pathSection) {
+        splitPath[idx] = params[key];
+      }
+    });
+  });
+
+  if(queryParams) {
+    qp += '?';
+
+    Object.keys(queryParams)
+    .forEach((key, idx) => {
+      let separator = idx > 0 ? '&' : '';
+      qp += separator + key + '=' + queryParams[key];
+    });
+  }
+
+  return splitPath.join('/') + qp;
+}

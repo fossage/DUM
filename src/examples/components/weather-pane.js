@@ -3,9 +3,7 @@ import {Pane} from '../component-templates/pane';
 
 export let weatherPane = Pane({color: 'RGB(255, 21, 30)', padding: '15px'});
 
-weatherPane.subscribe('openWeather', () => {
-  weatherPane.to(1.4, {y: 235, delay: 0.6});
-})
+weatherPane
 .touchStart((el) => {
   el.animation.reverse();
   

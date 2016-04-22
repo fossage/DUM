@@ -4,7 +4,6 @@
 =======================================*/
 import {curry} from './utils/functional';
 import {traverseNodes, callNodesEventCallbacks, createEvent} from './utils/element'
-let TweenMax = require('gsap');
 
 /*=======================================
             METHOD DEFINITIONS
@@ -74,18 +73,6 @@ let decorateEl = (function() {
 
       click: {
         value: _setUpHandler('click', el)
-      },
-
-      to: {
-        value: _setUpSingleAnimation(el, 'to')
-      },
-
-      from: {
-        value: _setUpSingleAnimation(el, 'from')
-      },
-
-      fromTo: {
-        value: _setUpGroupAnimation(el)
       },
 
       mouseDown: {
@@ -319,52 +306,6 @@ let decorateEl = (function() {
 
       return el;
     };
-  }
-
-  function _setUpSingleAnimation(el, type) {
-    let currentAnimation = {duration: null, vars: null};
-
-    return (duration, vars) => {
-      if(el.animation && !el.animation._reversed) {
-        el.animation.reverse();
-        Object.assign(el, 'to', {
-          value: TweenMax[type].bind(TweenMax, el, duration, vars),
-          writable: false,
-          configurable: true
-        });
-
-      // Ugly logic block ahead!!!
-      } else if(
-        (el.animation && el.animation._reversed) 
-        || duration !== currentAnimation.duration 
-        || !Object.is(vars, currentAnimation.vars)) {
-
-        let timeLine = TweenMax[type](el, duration, vars);
-        el.animation = timeLine; 
-      }
-
-      return el;
-    }
-  }
-
-  function _setUpGroupAnimation(el) {
-    let currentAnimation = {duration: null, fromVars: null, toVars: null};
-
-    return (duration, fromVars, toVars) => {
-
-      // Ugly logic block ahead!!!
-      if(duration !== currentAnimation.duration 
-        || !Object.is(fromVars, currentAnimation.fromVars) 
-        || !Object.is(toVars, currentAnimation.toVars)) 
-      {
-
-        let timeLine = TweenMax.fromTo(el, duration, fromVars, toVars);
-
-        if (!el.animation) el.animation = timeLine;
-      }
-
-      return el;
-    }
   }
 }());
 

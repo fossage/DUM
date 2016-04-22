@@ -2,6 +2,7 @@
 
 import {DUM} from '../../dum-core/dum';
 let http = {};
+let _serverRoot = 'http://';
 
 export let HTTP = DUM.service('HTTP', http);
 
@@ -20,47 +21,31 @@ Object.defineProperties(http, {
 
   delete: {
     value: null
+  },
+  
+  config: {
+    value: (opts) => {
+      _serverRoot += opts.serverRoot;
+    }
   }
   
 });
 
-
-
 function _request(type) {
-  return (endpoint, opts, headerOpts = {}) => {
-    
+  return (endpoint, initOpts = {}, headerOpts = {}) => {
     
     let myHeaders = new Headers(headerOpts);
 
-    let myInit = { 
+    let myInit = Object.assign({ 
       method: type,
       headers: myHeaders,
       mode: 'cors',
       cache: 'default' 
-    };
+    }, initOpts);
 
     fetch(endpoint, myInit)
     .then((response) => {
       return response;
     });
   }
-}
-
-function _assembleUrl(url, params, queryParams) {
-  var splitPath = url.split('/');
-  var paramKeys = _.keys(params);
-
-  _.each(splitPath, function(pathSection, index) {
-
-    _.each(paramKeys, function(key) {
-      if (':' + key === pathSection) {
-        splitPath[index] = params[key];
-      }
-    });
-  });
-
-  var path = splitPath.join('/');
-  path += queryParams || '';
-  
-  return path;
 }

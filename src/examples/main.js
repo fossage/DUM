@@ -7,7 +7,13 @@ require('./styles/main.scss');
 /*======== COMPONENT SETUP =======*/
 
 /*======== LINKAGE =======*/
-DUM.Router
+DUM.config([{
+  name: 'HTTP',
+  options: {
+    serverRoot: 'localhost:6020'
+  }
+}])
+.Router
 .config({
   root: { 
     name: 'root',

@@ -4,8 +4,6 @@ import {DUM} from '../../dum-core/dum';
 import {pxParser} from '../../dum-core/utils/string';
 import {Component} from '../../dum-core/factories/component';
 
-let TweenMax = require('gsap');
-
 export let Pane = Component((opts) => {
   
   let styles = Object.assign({ 
@@ -25,7 +23,6 @@ export let Pane = Component((opts) => {
     .div
     .setStyles(styles)
     .touchStart((el) => {
-      wrapper.to(0.2, styles);
       el.publish('closePane', {});
     });
     
