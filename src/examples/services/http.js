@@ -25,7 +25,7 @@ Object.defineProperties(http, {
   
   config: {
     value: (opts) => {
-      _serverRoot += opts.serverRoot;
+      _serverRoot += opts.serverRoot + '/';
     }
   }
   
@@ -33,19 +33,25 @@ Object.defineProperties(http, {
 
 function _request(type) {
   return (endpoint, initOpts = {}, headerOpts = {}) => {
+    let defaultHeaders = {'content-type': 'application/json'};
+    let myHeaders = new Headers(Object.assign(defaultHeaders, headerOpts));
     
-    let myHeaders = new Headers(headerOpts);
-
-    let myInit = Object.assign({ 
+    let initializer = Object.assign({ 
       method: type,
       headers: myHeaders,
       mode: 'cors',
       cache: 'default' 
     }, initOpts);
+    
+    let path = _serverRoot + (endpoint || '');
 
-    fetch(endpoint, myInit)
+    return fetch(`http://localhost:3000/api/${endpoint}`, initializer)
     .then((response) => {
-      return response;
+      return response
+      [initOpts.contentType || 'json']()
+      .then((res) => {
+        return res;
+      });
     });
   }
 }

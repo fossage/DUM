@@ -1,7 +1,7 @@
 import {DUM} from '../../dum-core/dum';
-export let deepstream = require('../../../node_modules/deepstream.io-client-js/src/client.js');
-export let ds = deepstream( 'localhost:6020' ).login();
-export let record = ds.record.getRecord( 'someUser' );
+// export let deepstream = require('../../../node_modules/deepstream.io-client-js/src/client.js');
+// export let ds = deepstream( 'localhost:6020' ).login();
+// export let record = ds.record.getRecord( 'someUser' );
 
 export let todoList = () => {
   let wrapper = DUM
@@ -31,7 +31,7 @@ export let todoList = () => {
       let val = input.val();
       if(!val) return false;
       input.val(null);
-      record.set( 'todoItem', val );
+      list.append(DUM.li.text(val).setClass('collection-item'));
     })
     .append(
       
@@ -64,9 +64,9 @@ export let todoList = () => {
       .append(input, button)
     );
     
-  record.subscribe( 'todoItem',(val) => {
-    list.append(DUM.li.text(val).setClass('collection-item'));
-  });
+  // record.subscribe( 'todoItem',(val) => {
+  //   list.append(DUM.li.text(val).setClass('collection-item'));
+  // });
     
   return wrapper.append(list);
 }

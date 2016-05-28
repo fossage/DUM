@@ -14,7 +14,13 @@
     "deepstream.io-client-js": "^0.5.0",
     "deepstream.io-storage-rethinkdb": "^0.1.0",
     "koa": "^1.2.0",
-    "rethinkdb": "^2.3.0"
+    "koa-bodyparser": "^2.2.0",
+    "koa-pixie-proxy": "^1.0.7",
+    "koa-router": "^5.4.0",
+    "koa-static": "^2.0.0",
+    "request": "^2.72.0",
+    "rethinkdb": "^2.3.0",
+    "snoowrap": "^1.0.0-rc.2"
   },
   "devDependencies": {
     "babel": "^6.3.26",

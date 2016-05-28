@@ -10,7 +10,7 @@ require('./styles/main.scss');
 DUM.config([{
   name: 'HTTP',
   options: {
-    serverRoot: 'localhost:6020'
+    serverRoot: 'localhost:3000/api'
   }
 }])
 .Router

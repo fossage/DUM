@@ -27,7 +27,10 @@ export let mainNav = () => {
         .append(
           navItem('todo', 'Todo List'),
           navItem('reddit', 'Reddit'),
-          navItem('/', 'Calendar')
+          DUM.li.append(DUM.a.text('Calendar'))
+          .click(() => {
+            HTTP.get();
+          })
         )
     )));
     

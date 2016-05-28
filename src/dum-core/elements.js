@@ -45,7 +45,16 @@ Object.defineProperties(DUM, {
   },
 
   a: {
-    get: () => DUM.createEl('a')
+    get: () => {
+      let a = DUM.createEl('a');
+      
+      a.setHref = (link) => {
+        a.setAttribute('href', link);
+        return a;
+      }
+      
+      return a;
+    }
   },
   
   p: {
