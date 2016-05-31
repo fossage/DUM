@@ -47,11 +47,7 @@ function _request(type) {
 
     return fetch(`http://localhost:3000/api/${endpoint}`, initializer)
     .then((response) => {
-      return response
-      [initOpts.contentType || 'json']()
-      .then((res) => {
-        return res;
-      });
+      return response[initOpts.contentType || 'json']();
     });
   }
 }

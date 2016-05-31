@@ -1,10 +1,10 @@
 import {HTTP} from './http';
 import {DUM} from '../../dum-core/dum';
+import {StateManager} from './state-manager'
 
-let reddit = {};
-export let Reddit = DUM.service('reddit', reddit);
+export let Reddit = DUM.service('Reddit');
 
-Object.defineProperties(reddit, {
+Object.defineProperties(Reddit, {
   _credentials: {
     value: null,
     readable: true,
@@ -16,22 +16,30 @@ Object.defineProperties(reddit, {
     value: ()=> {
       return HTTP.get('authorize_reddit')
       .then((res) => {
-        reddit._credentials = res;
+        Reddit._credentials = res;
         return res;
       });
     }
   },
   
   get: {
-    value: (subReddit = 'webdev', type = 'hot') => {
-      let myHeaders = {'token': reddit._credentials.access_token};
-      let endpoint = `https://oauth.reddit.com/r/${subReddit}/${type}`;
+    value: (opts = {}) => {
+      let headers = {'token': Reddit._credentials.access_token};
       
-      if(!reddit._credentials) {
+      if(!Reddit._credentials) {
         throw new Error('Reddit service must get authorization creditials via Reddit.authorize() before making requests.');
       }
       
-      return HTTP.get(`reddit/${subReddit}/${type}`, {}, myHeaders);
+      // return HTTP.get(`reddit/${subReddit}/${type}`, {}, headers);
+      
+      return StateManager.get({
+        name: 'subreddit',
+        urlParams: {
+          subReddit: opts.subReddit || 'funny', 
+          type: opts.type || 'hot'
+        },
+        headers: headers
+      }, opts)
     }
   }
 });
