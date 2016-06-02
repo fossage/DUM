@@ -146,6 +146,30 @@ let decorateEl = (function() {
           }
         }
       },
+      
+      empty: {
+        value: () => {
+          try {
+            for(let i = el.childNodes.length -1; i > -1; i--){
+              let node = el.childNodes[i];
+              traverseNodes(node, callNodesEventCallbacks, 'willUnMount');
+              let removedEl =  el.removeChild(node);
+              traverseNodes(node, curry(callNodesEventCallbacks, 'didUnMount'));
+              node.$$mounted = false;
+
+              Object.keys(node.$$eventCallbacks).forEach((key) => {
+                node.$$eventCallbacks[key].forEach((cb) => {
+                  node.removeEventListener(key, cb);
+                });
+              });
+            }
+          } catch (e) {
+            console.error(e);
+            console.warn('Cant remove element because no parent was found');
+            return el;
+          }
+        }
+      },
 
       remove: {
         value: () => {
@@ -252,6 +276,17 @@ let decorateEl = (function() {
           
           return el;
         }
+      },
+      
+      attr: {
+        value: (key, val) => {
+          if(!val){
+            return el.getAttribute(key);
+          } else {
+            el.setAttribute(key, val);
+            return el;
+          }
+        } 
       },
 
       setSrc: {

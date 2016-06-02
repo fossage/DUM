@@ -8,6 +8,7 @@ let _routes = {};
 let _currentState = null;
 let _prevState = null;
 let _rootView = null;
+let _initialized = false;
 
 window.addEventListener('popstate', (e) => {
   let state = e.state || DUM.Router.$$config.root;
@@ -54,6 +55,9 @@ Object.defineProperties(DUM.Router, {
         if(!route.name || !route.path) throw new Error('Route objects require a name and a path key to be set.');
         _routes[route.name] = route;
       });
+      
+      if(!_initialized) DUM.Router.goTo(window.location.pathname.slice(1));
+      _initialized = true;
 
       return DUM.Router;
     }

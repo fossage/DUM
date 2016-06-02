@@ -17,10 +17,10 @@
     "koa-bodyparser": "^2.2.0",
     "koa-pixie-proxy": "^1.0.7",
     "koa-router": "^5.4.0",
+    "koa-send": "^3.2.0",
     "koa-static": "^2.0.0",
     "request": "^2.72.0",
-    "rethinkdb": "^2.3.0",
-    "snoowrap": "^1.0.0-rc.2"
+    "rethinkdb": "^2.3.0"
   },
   "devDependencies": {
     "babel": "^6.3.26",

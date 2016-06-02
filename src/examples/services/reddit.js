@@ -7,18 +7,21 @@ export let Reddit = DUM.service('Reddit');
 Object.defineProperties(Reddit, {
   _credentials: {
     value: null,
-    readable: true,
     configurable: true,
     writable: true
   },
-
+  
   authorize: {
     value: ()=> {
-      return HTTP.get('authorize_reddit')
-      .then((res) => {
-        Reddit._credentials = res;
-        return res;
-      });
+      if(!Reddit._credentials) {
+        return HTTP.get('authorize_reddit')
+        .then((res) => {
+          Reddit._credentials = res;
+          return res;
+        });
+      } else {
+        return Promise.resolve(Reddit._credentials);
+      }
     }
   },
   

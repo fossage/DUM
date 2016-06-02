@@ -5,6 +5,7 @@ let   KOA              = require('koa'),
       Deepstream       = require('deepstream.io'),
       Router           = require('koa-router'),
       BodyParser       = require('koa-bodyparser'),
+      Send             = require('koa-send'),
       Static           = require('koa-static'),
       staticDir        = Static('../dst'),
       ds               = new Deepstream(),
@@ -56,12 +57,12 @@ router
   });
 })
 
-.get('/authorize_callback', function *(next) {
-  console.log('sldjfldsjfkdlsjfkl');
-});
-
 app
 .use(router.routes())
+.use(function*(next) {
+  this.path = '/index.html';
+  yield Send(this, this.path, { root: __dirname + '/../dst' });
+})
 .use(router.allowedMethods({throw: true}))
 .use(staticDir)
 .listen(3000);
