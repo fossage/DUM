@@ -1,4 +1,5 @@
 'use strict';
+import {DUM} from '../dum';
 
 /* 
   Exports a high level component constructor function which takes
@@ -33,3 +34,5 @@ export let Component = (defaultConstructor) => {
     
   }
 }
+
+

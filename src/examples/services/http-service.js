@@ -4,7 +4,7 @@ import {DUM} from '../../dum-core/dum';
 let http = {};
 let _serverRoot = 'http://';
 
-export let HTTP = DUM.service('HTTP', http);
+export let HTTP = DUM.Service('HTTP', http);
 
 Object.defineProperties(http, {
   get: {

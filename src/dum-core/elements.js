@@ -24,15 +24,17 @@ Object.defineProperties(DUM, {
       
       // here we call any 'didMount' lifecycle callbacks for each element being attached
       [...args].forEach((arg) => {
-        if(arg.constructor === Array){
-          arg.forEach((elem) => {
-            var current = elem;
-            traverseNodes(elem, curry(callNodesEventCallbacks, 'didMount'));
-            elem.$$mounted = true;
-          });
-        } else {
-          traverseNodes(arg, curry(callNodesEventCallbacks, 'didMount'));
-          arg.$$mounted = true;
+        if(arg){
+          if(arg.constructor === Array){
+            arg.forEach((elem) => {
+              var current = elem;
+              traverseNodes(elem, curry(callNodesEventCallbacks, 'didMount'));
+              elem.$$mounted = true;
+            });
+          } else {
+            traverseNodes(arg, curry(callNodesEventCallbacks, 'didMount'));
+            arg.$$mounted = true;
+          }
         }
       });
       

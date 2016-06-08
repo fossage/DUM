@@ -1,8 +1,8 @@
-import {HTTP} from './http';
+import {HTTP} from './http-service';
 import {DUM} from '../../dum-core/dum';
-import {StateManager} from './state-manager'
+import {StateManager} from './state-manager-service'
 
-export let Reddit = DUM.service('Reddit');
+export let Reddit = DUM.Service('Reddit', {});
 
 Object.defineProperties(Reddit, {
   _credentials: {
@@ -33,15 +33,13 @@ Object.defineProperties(Reddit, {
         throw new Error('Reddit service must get authorization creditials via Reddit.authorize() before making requests.');
       }
       
-      // return HTTP.get(`reddit/${subReddit}/${type}`, {}, headers);
-      
       return StateManager.get({
         name: 'subreddit',
+        headers: headers,
         urlParams: {
           subReddit: opts.subReddit || 'funny', 
           type: opts.type || 'hot'
-        },
-        headers: headers
+        }
       }, opts)
     }
   }

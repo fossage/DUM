@@ -2,7 +2,7 @@
 import {createEvent} from './utils/element';
 import {DUM} from './dum';
 
-DUM.Router = {};
+DUM.Router = DUM.Service('Router', {});
 
 let _routes = {};
 let _currentState = null;
@@ -10,12 +10,17 @@ let _prevState = null;
 let _rootView = null;
 let _initialized = false;
 
+/*===============================================
+            LISTENER INITIALIZATION
+============================================== */
 window.addEventListener('popstate', (e) => {
   let state = e.state || DUM.Router.$$config.root;
   _prevState = _currentState;
   
+  // ensure we don't remove our root view
   if(_prevState.name !== 'root') _routes[_prevState.name].$$instanceView.remove();
   
+  // if not root route, append the view associated with the route to root view
   if(state.name !== 'root') {
     let iView = _routes[state.name].view();
     _currentState = _routes[state.name]
@@ -26,6 +31,9 @@ window.addEventListener('popstate', (e) => {
   }
 });
 
+/*===============================================
+             METHOD/PROP DEFINITIONS
+============================================== */
 Object.defineProperties(DUM.Router, {
   $$config: {
     value: {
@@ -56,7 +64,17 @@ Object.defineProperties(DUM.Router, {
         _routes[route.name] = route;
       });
       
-      if(!_initialized) DUM.Router.goTo(window.location.pathname.slice(1));
+      // if we are on inital app load, automatically go to the pathname in url
+      if(!_initialized) {
+        let path = window.location.pathname;
+        
+        if(path !== '/') { 
+          DUM.Router.goTo(path.slice(1));
+        } else {
+          let root = DUM.Router.$$config.root;
+          DUM.Router.goTo(root.redirectTo || root.path);
+        }
+      } 
       _initialized = true;
 
       return DUM.Router;

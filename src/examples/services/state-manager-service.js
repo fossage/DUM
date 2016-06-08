@@ -5,14 +5,14 @@
  * @namespace StateManagerService
  */
 
-import {ResourceMap} from './resource-map';
-import {HTTP} from './http';
-import {LRU} from './lru';
+import {ResourceMap} from './resource-map-service';
+import {HTTP} from './http-service';
+import {LRU} from './lru-service';
 import {DUM} from '../../dum-core/dum';
 import {assembleUrl} from '../../dum-core/utils/string';
 import {createEvent} from '../../dum-core/utils/element';
  
-export let StateManager = DUM.service('StateManager', {});
+export let StateManager = DUM.Service('StateManager', {});
 
 let staleAfter         = 10000000;
 let processingRequestsMap = {};

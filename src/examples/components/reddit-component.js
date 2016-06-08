@@ -1,13 +1,18 @@
 import {DUM} from '../../dum-core/dum';
-import {Reddit} from '../services/reddit';
+import {Reddit} from '../services/reddit-service';
 
-export let test = () => {
+export let reddit = DUM.Component((options = {}) => {
   
-  let loader = DUM.div.setClass('progress').append(
+  /*======= ELEMENT SETUP =======*/
+  let loader = DUM.div
+  .setClass('progress').append(
     DUM.div.setClass('indeterminate')
   ).setStyles({position: 'fixed'});
   
-  let list = DUM.ul.setClass('collection')
+  let list = DUM.ul
+  .setClass('collection')
+  .setStyles({width: '90%', maxWidth: '1000px', margin: '0 auto', border: 'none'})
+  
   let col6 = () => DUM.div.setClass('col', 's12');
   let inputElement = DUM.input.setClass('validate').placeHolder('subreddit');
   
@@ -16,7 +21,7 @@ export let test = () => {
   .append(DUM.i.setClass('material-icons').text('add'))
   .click(() => {
     let val = inputElement.value;
-    if(val) getSubreddit(val);
+    if(val) _getSubreddit(val);
   });
   
   let input = DUM
@@ -27,18 +32,21 @@ export let test = () => {
     )
   );
   
+  /*======= MAIN COMPONENT ASSEMBLY =======*/
   let container = DUM.div.append(
     loader,
     input,
     list
   );
   
+  /*======= INITIALIZATION =======*/
   Reddit.authorize()
   .then(() => {
-    return getSubreddit('all');
+    return _getSubreddit(options.sub || 'all', options.type);
   });
-  
-  function getSubreddit(subName) {
+
+  /*========= PRIVATE FUNCTIONS =========*/
+  function _getSubreddit(subName) {
     list.empty();
     loader.setStyles({display: 'block'});
     return Reddit.get({subReddit: subName})
@@ -56,7 +64,7 @@ export let test = () => {
         list.append(
           DUM.li.setClass('collection-item', 'avatar').append(
             DUM.img.setClass('circle').setSrc(thumbnail),
-            DUM.a.text(item.data.title).setHref(item.data.url),
+            DUM.a.text(item.data.title).setHref(item.data.url).attr('target', '_blank'),
             DUM.p.append(
               DUM.span.append(DUM.i.setClass('material-icons').text('thumb_up').setStyles({color: '#4db6ac'})),
               DUM.span.text(item.data.ups)
@@ -68,4 +76,4 @@ export let test = () => {
   }
   
   return container;
-}
+});

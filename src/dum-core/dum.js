@@ -2,6 +2,8 @@
 /*=======================================
             IMPORTS/EXPORTS
 =======================================*/
+import {Component} from './factories/component';
+import {Service} from './factories/service';
 import {curry} from './utils/functional';
 import {traverseNodes, callNodesEventCallbacks, createEvent} from './utils/element'
 
@@ -199,7 +201,15 @@ let decorateEl = (function() {
 
       setClass: {
         value: (...args) => {
-          if(el.classList) el.classList.add(...args);
+          if(el.classList && args[0]) {
+            if(args.length > 1)  {
+              el.classList.add(...args);
+            } else {
+              let classes = [...args][0].split(' ');
+              el.classList.add(...classes);
+            }
+          }
+        
           return el;
         }
       },
@@ -361,5 +371,13 @@ Object.defineProperties(DUM, {
   
   decorateEl: {
     value: decorateEl
+  },
+  
+  Component: {
+    value: Component
+  },
+  
+  Service: {
+    value: Service
   }
 });

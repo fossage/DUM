@@ -1,5 +1,4 @@
 import {DUM} from './dum';
-import {_serviceRegistry} from './factories/service';
 
 DUM.config = (configOpts) => {
   if(configOpts.constructor !== Array) {
@@ -8,7 +7,7 @@ DUM.config = (configOpts) => {
   }
   
   configOpts.forEach((opt) => {
-    let config = _serviceRegistry[opt.name].config;
+    let config = DUM.Service(opt.name).config;
     if(!config) throw new Error('Services must have a config method set to be used in the config phase');
     config(opt.options);
   });

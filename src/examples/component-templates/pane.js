@@ -2,9 +2,8 @@
 
 import {DUM} from '../../dum-core/dum';
 import {pxParser} from '../../dum-core/utils/string';
-import {Component} from '../../dum-core/factories/component';
 
-export let Pane = Component((opts) => {
+export let Pane = DUM.Component((opts) => {
   
   let styles = Object.assign({ 
     color: '#fff',

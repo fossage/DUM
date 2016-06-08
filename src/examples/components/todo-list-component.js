@@ -3,7 +3,7 @@ import {DUM} from '../../dum-core/dum';
 // export let ds = deepstream( 'localhost:6020' ).login();
 // export let record = ds.record.getRecord( 'someUser' );
 
-export let todoList = () => {
+export let todoList = DUM.Component((options = {}) => {
   let wrapper = DUM
     .div
     .setClass('card')
@@ -20,18 +20,36 @@ export let todoList = () => {
     .setClass('input-field')
     .setType('text');
     
+    let item = (val) => {
+      let i = DUM
+      .li
+      .text(val)
+      .setClass('collection-item')
+      .append(
+        DUM
+        .i
+        .setClass('material-icons', 'right')
+        .setStyles({cursor: 'pointer'})
+        .text('delete')
+        .click(() => {i.remove()})
+      )
+
+      return i;
+    }
+    
   let button = DUM
     .a
     .setStyles({ 
       position: 'relative',
       top: '18px'
     })
-    .setClass('btn', 'btn-floating', 'waves-effect', 'waves-light', 'cyan')
+    .setClass('btn', 'btn-floating', 'cyan')
     .click(() => {
       let val = input.val();
       if(!val) return false;
       input.val(null);
-      list.append(DUM.li.text(val).setClass('collection-item'));
+      
+      list.append(item(val));
     })
     .append(
       
@@ -63,10 +81,10 @@ export let todoList = () => {
       .setClass('collection-item')
       .append(input, button)
     );
-    
-  // record.subscribe( 'todoItem',(val) => {
-  //   list.append(DUM.li.text(val).setClass('collection-item'));
-  // });
-    
+
+    if(options.items) options.items.forEach((itm) => {
+      list.append(item(itm));
+    });
+
   return wrapper.append(list);
-}
+})
