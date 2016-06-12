@@ -13,8 +13,6 @@ import {DUM} from '../dum';
 
 export let Component = (defaultConstructor) => {
   return (opts = {}) => { 
-    // If the user defined opts and its an array, set it up here and 
-    // take the early out at the return statement, otherwise go below 'if' block
     if(opts.constructor === Array) {
       let fragment          = document.createDocumentFragment();
       fragment.$constructor = Component(defaultConstructor);
@@ -25,13 +23,12 @@ export let Component = (defaultConstructor) => {
       });
       
       return fragment; 
+    } else {
+      let comp          = defaultConstructor(opts);
+      comp.$constructor = Component(defaultConstructor);
+    
+      return comp;
     }
- 
-    let comp          = defaultConstructor(opts);
-    comp.$constructor = Component(defaultConstructor);
-    
-    return comp;
-    
   }
 }
 

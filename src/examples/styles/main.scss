@@ -25,3 +25,7 @@
    .input-field .prefix.active {
      color: #000;
    }
+
+   .highlight li.collection-item:not(.todo-input):hover {
+     background-color: #eee;
+   }

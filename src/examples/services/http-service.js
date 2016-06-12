@@ -44,10 +44,15 @@ function _request(type) {
     }, initOpts);
     
     let path = _serverRoot + (endpoint || '');
+    DUM.publish('loaderStart');
 
     return fetch(`http://localhost:3000/api/${endpoint}`, initializer)
     .then((response) => {
-      return response[initOpts.contentType || 'json']();
+      return response[initOpts.contentType || 'json']()
+      .then((data) => {
+        DUM.publish('loaderStop');
+        return data;
+      });
     });
   }
 }

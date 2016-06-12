@@ -37,6 +37,7 @@ function createEl(elName) {
   return decoratedEl;
 }
 
+// @todo - should we expose decorateEl? Seems like it should be a private function
 let decorateEl = (function() {
   let uid = 0;
 
@@ -129,6 +130,42 @@ let decorateEl = (function() {
               el.appendChild(childEl);
             }
           });
+
+          return el;
+        }
+      },
+
+      prepend: {
+        value: (...args) => {
+          let fragment = null;
+          let nodeToPrepend = null;
+          let argsArray = [...args];
+
+          for(let i = argsArray.length - 1; i >= 0; i--) {
+            let childEl = argsArray[i];
+
+            if(childEl && childEl.constructor === Array){
+              if(!fragment) fragment = document.createDocumentFragment();
+
+              childEl.forEach((elem) => {
+                if(!elem.$$mounted){
+                  traverseNodes(elem, curry(callNodesEventCallbacks, 'willMount'));
+                  fragment.appendChild(elem);
+                }
+              });
+              
+              nodeToPrepend = fragment;
+            } else if(childEl){
+              if(!childEl.$$mounted) traverseNodes(childEl, curry(callNodesEventCallbacks, 'willMount'));
+              nodeToPrepend = childEl;
+            }
+
+            try {
+              el.insertBefore(nodeToPrepend, el.childNodes[0]);
+            } catch(e) {
+              el.append(nodeToPrepend);
+            }
+          }
 
           return el;
         }
@@ -371,6 +408,13 @@ Object.defineProperties(DUM, {
   
   decorateEl: {
     value: decorateEl
+  },
+
+  publish: {
+    value: function(eventName, data) {
+      let e = createEvent(eventName, data);
+      document.dispatchEvent(e);
+    }
   },
   
   Component: {

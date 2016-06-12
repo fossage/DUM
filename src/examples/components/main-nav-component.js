@@ -1,6 +1,7 @@
 import {DUM} from '../../dum-core/dum';
 import {HTTP} from '../services/http-service';
 import {NavButton} from '../component-templates/nav-button';
+import {Loader} from '../component-templates/loader';
 
 export let mainNav = DUM.Component((options) => {
   
@@ -8,6 +9,8 @@ export let mainNav = DUM.Component((options) => {
   let navList  = [];
   let extraNav = [];
   let mainNav  = DUM.ul.setClass('right');
+  let loader = Loader({type: 'circular', color: 'blue'});
+  navList.push(DUM.li.append(loader));
 
   options.items.forEach((item) => {
     let useLi     = !item.type || item.type === 'li';
@@ -43,5 +46,5 @@ export let mainNav = DUM.Component((options) => {
         mainNav
     )));
 
-    return navBar;
+    return DUM.div.append(navBar);
 });

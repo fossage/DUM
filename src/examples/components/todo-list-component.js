@@ -1,14 +1,18 @@
 import {DUM} from '../../dum-core/dum';
+import {List} from '../component-templates/list';
 // export let deepstream = require('../../../node_modules/deepstream.io-client-js/src/client.js');
 // export let ds = deepstream( 'localhost:6020' ).login();
 // export let record = ds.record.getRecord( 'someUser' );
 
 export let todoList = DUM.Component((options = {}) => {
+  
+  /*========= COMPONENT WRAPPER ========*/
   let wrapper = DUM
     .div
     .setClass('card')
     .setStyles({maxWidth: '600px', margin: '0 auto'})
-    
+  
+  /*========= Input Element ========*/
   let input = DUM
     .input
     .setStyles({
@@ -20,10 +24,51 @@ export let todoList = DUM.Component((options = {}) => {
     .setClass('input-field')
     .setType('text');
     
-    let item = (val) => {
+  /*========= Add Item Button ========*/
+  let button = DUM
+    .a
+    .setStyles({ 
+      position: 'relative',
+      top: '18px'
+    })
+    .setClass('btn', 'btn-floating', 'cyan')
+    .click(() => {
+      let val = input.val();
+      if(!val) return false;
+      input.val(null);
+      
+      list.append(itemTemplate({val: val}));
+    })
+    .append(
+      
+      DUM
+      .i
+      .setClass('material-icons')
+      .text('add')
+    );
+
+    /*========= Input Data LI ========*/
+    let inputItem = DUM
+      .li
+      .setClass('collection-item', 'todo-input')
+      .append(input, button);
+    
+    /*========= List Header LI ========*/
+    let headerItem = DUM
+      .li
+      .setClass('collection-header')
+      .append(
+        DUM
+        .h4
+        .text('Todo List')
+        .setStyles({textAlign: 'center'})
+      );
+
+    /*========= LI TEMPLATE FUNCTION ========*/
+    let itemTemplate = (data) => {
       let i = DUM
       .li
-      .text(val)
+      .text(data.val)
       .setClass('collection-item')
       .append(
         DUM
@@ -37,53 +82,17 @@ export let todoList = DUM.Component((options = {}) => {
       return i;
     }
     
-  let button = DUM
-    .a
-    .setStyles({ 
-      position: 'relative',
-      top: '18px'
+    /*========= MAIN LIST CONSTRUCTOR ========*/
+    let list = List({
+      listClasses: ['collection', 'with-header', 'highlight'],
+      items: [{val: 'thing'}, {val: 'otherThing'}],
+      itemTemplate: itemTemplate
     })
-    .setClass('btn', 'btn-floating', 'cyan')
-    .click(() => {
-      let val = input.val();
-      if(!val) return false;
-      input.val(null);
-      
-      list.append(item(val));
-    })
-    .append(
-      
-      DUM
-      .i
-      .setClass('material-icons')
-      .text('add')
-    );
-    
-  let list = DUM
-    .ul
-    .setClass('collection', 'with-header')
-    .append(
-      
-      DUM
-      .li
-      .setClass('collection-header')
-      .append(
-        
-        DUM
-        .h4
-        .text('ToDo List')
-        .setStyles({textAlign: 'center'}))
-    )
-    .append(
-      
-      DUM
-      .li
-      .setClass('collection-item')
-      .append(input, button)
-    );
+    .setClass('collection', 'with-header', 'highlight')
+    .prepend(headerItem, inputItem);
 
     if(options.items) options.items.forEach((itm) => {
-      list.append(item(itm));
+      list.append(itemTemplate({val: itm}));
     });
 
   return wrapper.append(list);

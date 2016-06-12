@@ -4,11 +4,11 @@ import {DUM} from './dum';
 
 DUM.Router = DUM.Service('Router', {});
 
-let _routes = {};
+let _routes       = {};
+let _rootView     = null;
+let _prevState    = null;
+let _initialized  = false;
 let _currentState = null;
-let _prevState = null;
-let _rootView = null;
-let _initialized = false;
 
 /*===============================================
             LISTENER INITIALIZATION
