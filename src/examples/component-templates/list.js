@@ -14,5 +14,5 @@ export let List = DUM.Component((opts) => {
     listContainer.append(options.itemTemplate(item));
   });
 
-  return listContainer; 
+  return listContainer.setClass('list'); 
 });

@@ -86,6 +86,58 @@ let decorateEl = (function() {
         value: _setUpHandler('mouseUp', el)
       },
 
+      change : {
+        value: _setUpHandler('change', el)
+      },
+
+      mouseOver: {
+        value: _setUpHandler('mouseover', el)
+      },
+
+      mouseOut: {
+        value: _setUpHandler('mouseout', el)
+      },
+
+      keyDown: {
+        value: _setUpHandler('keydown', el)
+      },
+
+      keyUp: {
+        value: _setUpHandler('keyup', el)
+      },
+
+      keyPress: {
+        value: _setUpHandler('keypress', el)
+      },
+
+      hover: {
+        value: (enterCb, leaveCb) => {
+          if(!enterCb || !leaveCb){
+            console.warn('Hover handler requires both an enter and a leave callback as arguments.'); 
+            return el;
+          } 
+
+          if(!el.$$eventCallbacks.onmouseover) el.$$eventCallbacks.onmouseover = [];
+          if(!el.$$eventCallbacks.onmouseout) el.$$eventCallbacks.onmouseout = [];
+          el.$$eventCallbacks.onmouseover.push(enterCb.bind(el, el));
+          el.$$eventCallbacks.onmouseout.push(leaveCb.bind(el, el));
+
+          el.onmouseover = () => {
+            el.$$eventCallbacks.onmouseover.forEach((cb) => {
+              cb();
+            });
+          }
+
+          el.onmouseout = () => {
+            el.$$eventCallbacks.onmouseout.forEach((cb) => {
+              cb();
+            });
+          }
+
+          return el;
+        }
+      },
+
       // sets up listeners for component specific events such as lifecycle callbacks
       on: {
         value: (eventName, cb) => {
@@ -275,18 +327,40 @@ let decorateEl = (function() {
       // sets styles for the element in a stylesheet rather than on the component itself
       // to allow for overwrites via a css file and/or other components
       setStyles: {
-        value: (rules) => {
+        value: (rules = {}, important) => {
+          if(important) {
+            Object.keys(rules).forEach((key) => {
+              let cssKey = key.split(/(?=[A-Z])/).join("-");
+              el.attr('style', `${cssKey}:${rules[key]}`)
+            });
+            
+            return el;
+          }
+
+          let styleEl = null;
           let compClass = `component-${el.$uid}`;
           el.setClass(compClass);
 
-          var styleEl = document.createElement('style');
-          document.head.appendChild(styleEl); 
-          let styleSheet = styleEl.sheet;
-
-          var rule = `.${compClass} {\n`;
+          if(document.styleSheets.length) {
+            styleEl = document.styleSheets[document.styleSheets.length - 1];
+          } else {
+            styleEl = document.createElement('style').sheet;
+            document.head.appendChild(styleEl); 
+          }
+ 
+          let styleSheet = styleEl;
+          let rule = `.${compClass} {\n`;
 
           Object.keys(rules).forEach((key) => {
+            // @todo: figure out all values for blacklist
+            let pxBlacklist = ['font-weight', 'opacity'];
+            let value = rules[key];
             let cssKey = key.split(/(?=[A-Z])/).join("-");
+            
+            if(typeof value === 'number' && pxBlacklist.indexOf(cssKey) === -1) {
+              value = value + 'px';
+            }
+
             rule += `${cssKey}: ${rules[key]};\n`;
           });
 
@@ -380,9 +454,9 @@ let decorateEl = (function() {
       if(!el.$$eventCallbacks[domName]) el.$$eventCallbacks[domName] = [];
       el.$$eventCallbacks[domName] = el.$$eventCallbacks[domName].concat([(cb.bind(el, el))]);
 
-      el[domName] = () => {
+      el[domName] = (e) => {
         el.$$eventCallbacks[domName].forEach((cb) => {
-          cb();
+          cb(e);
         });
       }
 

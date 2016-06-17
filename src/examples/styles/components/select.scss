@@ -1,0 +1,35 @@
+.select-custom {
+  ul { 
+    max-height: 350px;
+    width: 100%;
+    background-color: #fff;
+    transition: all 0.1s ease-in-out; 
+    position: absolute; 
+    z-index: 10;
+    cursor: pointer;
+    padding: 0;
+
+    &.col             { padding: 0;                              }
+    li:hover          { background-color: #eee;                }
+    li.selected       { background-color: #666; color: #fff; }
+    li.selected:hover { background-color: #ccc; color: #000; }
+    
+    &.closed { 
+      height: 0; 
+      overflow: hidden; 
+      box-shadow: 0;
+    }
+
+    &.open {
+      height: auto;
+      overflow: auto;
+      box-shadow: 2px 2px 5px;
+    }
+  }
+
+  h4 { 
+    cursor: pointer; 
+    margin-bottom: 0; 
+    margin-left: 20px;
+  }
+}

@@ -10,7 +10,6 @@ export let mainNav = DUM.Component((options) => {
   let extraNav = [];
   let mainNav  = DUM.ul.setClass('right');
   let loader = Loader({type: 'circular', color: 'blue'});
-  navList.push(DUM.li.append(loader));
 
   options.items.forEach((item) => {
     let useLi     = !item.type || item.type === 'li';
@@ -26,6 +25,8 @@ export let mainNav = DUM.Component((options) => {
     
     group.push(basicItem)  
   });
+  
+  navList.push(DUM.li.append(loader));
   
   mainNav.append(navList);
 

@@ -1,0 +1,19 @@
+div.todo-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  
+  a.btn { position: relative; top: 18px; }
+
+  input.input-field {
+    width: 90%;
+    height: 20px;
+    position: relative;
+    top: 20px;
+  }
+
+  ul.list {
+    li.collection-header { text-align: center;   }
+    li.collection-item   { cursor: pointer;      }
+    li.todo-input        { padding-bottom: 20px; }
+  }
+}
