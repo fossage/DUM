@@ -59,7 +59,7 @@ export let todoList = DUM.Component((options = {}) => {
 
     return i;
   }
-  
+
   /*========= MAIN LIST CONSTRUCTOR ========*/
   let list = List({
     listClasses: ['collection', 'with-header', 'highlight'],

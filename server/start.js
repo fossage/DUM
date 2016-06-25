@@ -41,13 +41,29 @@ router
   })
 })
 
+.get('/api/reddit_image', function* (next){
+  let url = decodeURI(this.headers['reddit-url']);
+  let token = this.header.token;
+  console.log(url)
+  this.body = request({
+    url: url,
+    method: 'get',
+    headers: {'user-agent': REDDITUSERAGENT},
+    auth: {bearer: token}
+  }, (err, resp, body) => {
+    if(err) console.log(err);
+    return body;
+  })
+})
+
 .get('/api/reddit/:subreddit/:type', function *(next) {
   let subReddit = this.params.subreddit;
   let type = this.params.type;
+  let qs = this.querystring;
   let token = this.headers.token;
 
   this.body = request({
-    url: `https://oauth.reddit.com/r/${subReddit}/${type}` ,
+    url: `https://oauth.reddit.com/r/${subReddit}/${type}?${qs}` ,
     contentType: 'application/json',
     method: 'get',
     headers: {'user-agent': REDDITUSERAGENT},

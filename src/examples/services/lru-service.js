@@ -5,7 +5,7 @@ import {DUM} from '../../dum-core/dum';
  * in cache immutable with Object.freeze()
  */
   
-export let LRU = DUM.Service('LRU', {});
+export const LRU = DUM.Service('LRU', {});
 
 let _maxSize = 25;
 let _currentSize = 0;

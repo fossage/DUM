@@ -1,12 +1,15 @@
 import {DUM} from '../../dum-core/dum';
 import {Reddit} from '../services/reddit-service';
+import {Gen} from '../services/gen-service';
 import {List} from '../component-templates/list';
+import {SlideOpen} from '../component-templates/slide-open';
 import {Select} from '../component-templates/select';
 import {Col12, Col4, Row} from '../component-templates/grid';
 
-export let reddit = DUM.Component((options = {}) => {
+export const reddit = DUM.Component((options = {}) => {
   
   let responseType = '';
+  let after = '';
 
   /*=========================================== 
                   ELEMENT SETUP
@@ -19,7 +22,7 @@ export let reddit = DUM.Component((options = {}) => {
   .placeHolder('subreddit')
   .keyDown((el, e) => {
     if(e.code === 'Enter') {
-      _getSubreddit(el.value);
+      Gen.co(_subThenList.bind(null, el.value));
       el.value = null;
     }
   });
@@ -33,8 +36,8 @@ export let reddit = DUM.Component((options = {}) => {
       let val = inputElement.value;
       
       if(val) {
-        _getSubreddit(val);
-        el.value = null;
+        Gen.co(_subThenList.bind(null, val));
+        inputElement.value = null;
       }
     })
   );
@@ -69,43 +72,113 @@ export let reddit = DUM.Component((options = {}) => {
   /*=========================================== 
                   INITIALIZATION
   ============================================*/
-  Reddit.authorize()
-  .then(() => {
-    return _getSubreddit(options.sub || 'all', options.type);
+  Gen.co(function *(){
+    let subName = options.sub || 'all';
+    yield Reddit.authorize();
+    let response = yield _getSubreddit(subName);
+    console.log(response)
+    after = response.data.after;
+    yield _constructList.bind(null, response, subName);
+  })
+  .catch((e) => {
+    console.log(e);
   });
 
   /*=========================================== 
                 PRIVATE FUNCTIONS
   ============================================*/
   let list = null;
+  let lastReddit = null;
+  
+  
+  function _slideNotify() {
+    let currentVal = true;
+    let genr;
+    
+    return (gen) => {
+      if(gen) genr = gen;
+      currentVal = !currentVal;
+      genr.next(currentVal);
+    }
+  }
+  
   function _getSubreddit(subName) {
     if(list) list.empty();
-    return Reddit.get({subReddit: subName, type: responseType})
-    .then((resp) => {
-      list = List({ items: resp.data.children, itemTemplate: _itemTemplate})
-      .setClass('collection')
-
-      list.prepend(
-        DUM.li.append(
-          DUM.h4.text(`/r/${subName}`).setClass('collection-header')
-        )
-      );
-
-      container.append(list)
-    });
+    lastReddit = {subReddit: subName, type: responseType, queryParams: {limit: 20}};
+    return Reddit.get(lastReddit);
   }
 
-  function _itemTemplate(item) {
+  function _constructList(resp, subName) {
+    list = List({ items: resp.data.children, itemTemplate: _itemTemplate})
+    .setClass('collection');
+
+    list.prepend(
+      DUM.li.append(
+        DUM.h4.text(`/r/${subName}`).setClass('collection-header')
+      )
+    );
+
+    container.append(list);
+  }
+
+  function _itemTemplate(item, idx, length) {
+    let img = DUM.img;
     let thumbnail = item.data.thumbnail !== 'default' && item.data.thumbnail !== 'self' ? item.data.thumbnail : 'http://66.media.tumblr.com/avatar_afef10890beb_128.png';
+    let notifier = _slideNotify();
+    let slide = SlideOpen({
+      notifier: notifier,
+      template: slideTemplate
+    });
+
+
+    function slideTemplate() {
+      return img;
+    }
     
-    return DUM.li.setClass('collection-item', 'avatar').append(
+    let li = DUM.li.setClass('collection-item', 'avatar').append(
       DUM.img.setClass('circle').setSrc(thumbnail),
       DUM.a.text(item.data.title).setHref(item.data.url).attr('target', '_blank'),
       DUM.p.append(
         DUM.span.append(DUM.i.setClass('material-icons').text('thumb_up').setStyles({color: '#4db6ac'})),
         DUM.span.text(item.data.ups)
-      )
+      ),
+      slide
     )
+    .click(() => {
+      let srcs = item.data.preview.images[0].resolutions;
+      Reddit.getImage(srcs[srcs.length - 1].url)
+      .then((src) => {
+        img.setSrc(src);
+        notifier();
+      })
+    })
+
+    if(idx === length -1) {
+      li.behavior('onInView', {
+        cb: (val) => { 
+          lastReddit.queryParams = {after: after, limit: 20};
+          
+          Reddit.get(lastReddit)
+          .then((res) => {
+            after = res.data.after;
+            
+            res.data.children.forEach((itm, i) => {
+              list.append(_itemTemplate(itm, i, res.data.children.length))
+            });
+          })
+          .catch(e => console.log(e)); 
+        },
+        offset: 20,
+        once: true
+      });
+    }
+    return li;
+  }
+  
+  function* _subThenList(val){
+    let res = yield  _getSubreddit(val);
+    after = res.data.after;
+    yield _constructList.bind(null, res, val);
   }
 
   return container;

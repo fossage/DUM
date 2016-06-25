@@ -1,6 +1,6 @@
 'use strict';
 
-export let ResourceMap = {};
+export const ResourceMap = {};
 
 Object.defineProperties(ResourceMap, {
   subreddit: {

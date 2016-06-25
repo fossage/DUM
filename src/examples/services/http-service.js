@@ -4,7 +4,7 @@ import {DUM} from '../../dum-core/dum';
 let http = {};
 let _serverRoot = 'http://';
 
-export let HTTP = DUM.Service('HTTP', http);
+export const HTTP = DUM.Service('HTTP', http);
 
 Object.defineProperties(http, {
   get: {
@@ -52,7 +52,9 @@ function _request(type) {
       .then((data) => {
         DUM.publish('loaderStop');
         return data;
-      });
-    });
+      })
+      .catch(e => console.log(e));
+    })
+    .catch(e => console.log(e));
   }
 }

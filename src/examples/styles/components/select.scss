@@ -10,9 +10,9 @@
     padding: 0;
 
     &.col             { padding: 0;                              }
-    li:hover          { background-color: #eee;                }
-    li.selected       { background-color: #666; color: #fff; }
-    li.selected:hover { background-color: #ccc; color: #000; }
+    li:hover          { background-color: darken($color: #fff, $amount: 5);                }
+    li.selected       { background-color: darkorange; color: #fff; }
+    li.selected:hover { background-color: darken($color: darkorange, $amount: 5); }
     
     &.closed { 
       height: 0; 

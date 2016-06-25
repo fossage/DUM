@@ -1,0 +1,14 @@
+.slide-container {
+  height: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+
+  &.slide-open {
+    height: 400px;
+    overflow: auto;
+  }
+
+  img { 
+    width: 100%;
+  }
+}

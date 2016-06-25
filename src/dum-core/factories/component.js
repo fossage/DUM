@@ -11,7 +11,7 @@ import {DUM} from '../dum';
   for when we actually do need to create all new components)
 */
 
-export let Component = (defaultConstructor) => {
+export const Component = (defaultConstructor) => {
   return (opts = {}) => { 
     if(opts.constructor === Array) {
       let fragment          = document.createDocumentFragment();

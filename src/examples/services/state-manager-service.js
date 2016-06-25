@@ -12,7 +12,7 @@ import {DUM} from '../../dum-core/dum';
 import {assembleUrl} from '../../dum-core/utils/string';
 import {createEvent} from '../../dum-core/utils/element';
  
-export let StateManager = DUM.Service('StateManager', {});
+export const StateManager = DUM.Service('StateManager', {});
 
 let staleAfter         = 10000000;
 let processingRequestsMap = {};

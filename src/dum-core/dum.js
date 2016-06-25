@@ -4,6 +4,7 @@
 =======================================*/
 import {Component} from './factories/component';
 import {Service} from './factories/service';
+import {_behaviors, Behavior} from './factories/behavior';
 import {curry} from './utils/functional';
 import {traverseNodes, callNodesEventCallbacks, createEvent} from './utils/element'
 
@@ -42,6 +43,7 @@ let decorateEl = (function() {
   let uid = 0;
 
   return (el) => {
+    if(el.$uid) return el;
 
     Object.defineProperties(el, {
       $uid: {
@@ -110,6 +112,10 @@ let decorateEl = (function() {
         value: _setUpHandler('keypress', el)
       },
 
+      scroll: {
+        value: _setUpHandler('scroll', el)
+      },
+
       hover: {
         value: (enterCb, leaveCb) => {
           if(!enterCb || !leaveCb){
@@ -158,6 +164,13 @@ let decorateEl = (function() {
             el.$$eventCallbacks[eventName] = cbs;
           }
 
+          return el;
+        }
+      },
+
+      behavior: {
+        value: (name, opts) => {
+          _behaviors[name](el, opts);
           return el;
         }
       },
@@ -465,7 +478,7 @@ let decorateEl = (function() {
   }
 }());
 
-export let DUM = {};
+export const DUM = {};
 
 /*=======================================
          METHOD/PROPS ASSIGNMENT
@@ -497,5 +510,9 @@ Object.defineProperties(DUM, {
   
   Service: {
     value: Service
+  },
+
+  Behavior: {
+    value: Behavior
   }
 });

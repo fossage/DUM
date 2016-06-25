@@ -10,8 +10,8 @@ export let List = DUM.Component((opts) => {
   let listContainer = DUM.ul;
   if(options.onContainerClick) listContainer.onClick(options.onContainerClick);
 
-  options.items.forEach((item) => {
-    listContainer.append(options.itemTemplate(item));
+  options.items.forEach((item, idx) => {
+    listContainer.append(options.itemTemplate(item, idx, options.items.length));
   });
 
   return listContainer.setClass('list'); 
