@@ -250,6 +250,16 @@ let decorateEl = (function() {
           }
         }
       },
+
+      wait: {
+        value: (ms) => {
+          return new Promise((resolve, reject) => {
+            let id = setTimeout(() => {
+              resolve(el);
+            }, ms);
+          });
+        }
+      },
       
       empty: {
         value: () => {
@@ -260,12 +270,14 @@ let decorateEl = (function() {
               let removedEl =  el.removeChild(node);
               traverseNodes(node, curry(callNodesEventCallbacks, 'didUnMount'));
               node.$$mounted = false;
-
-              Object.keys(node.$$eventCallbacks).forEach((key) => {
-                node.$$eventCallbacks[key].forEach((cb) => {
-                  node.removeEventListener(key, cb);
+   
+              if(node.$$eventCallbacks){
+                Object.keys(node.$$eventCallbacks).forEach((key) => {
+                  node.$$eventCallbacks[key].forEach((cb) => {
+                    node.removeEventListener(key, cb);
+                  });
                 });
-              });
+              }
             }
           } catch (e) {
             console.error(e);
@@ -498,7 +510,7 @@ Object.defineProperties(DUM, {
   },
 
   publish: {
-    value: function(eventName, data) {
+    value: (eventName, data) => {
       let e = createEvent(eventName, data);
       document.dispatchEvent(e);
     }
@@ -514,5 +526,45 @@ Object.defineProperties(DUM, {
 
   Behavior: {
     value: Behavior
+  }, 
+
+  observe: {
+    value:(obj, watchHash) => {
+      let watch = function* (objct) {
+        let prevObj = objct;
+        let current;
+
+        while(true) {
+          if(!current) {
+            current = yield;
+          } else {
+            let handler = yield;
+            
+            if(prevObj[current.key] && prevObj[current.key] !== current.val){
+              handler(current.val, prevObj[current.key]);
+            }
+
+            prevObj[current.key] = current.val;
+          }
+        }
+      }(obj);
+
+      watch.next();
+
+      let binder = new Proxy(obj, {
+        set: (target, prop, value, receiver) => {
+          if(watchHash[prop]) {
+            watch.next({key: prop, val: value});
+            watch.next(watchHash[prop]);
+          }
+
+          target[prop] = value;
+
+          return true;
+        }
+      })
+
+      return binder;
+    }
   }
 });

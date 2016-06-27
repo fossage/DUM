@@ -34,3 +34,8 @@
    .highlight li.collection-item:not(.todo-input):hover {
      background-color: #eee;
    }
+
+   .video-container {
+     video { min-height: 300px; }
+     .video-elements {display: block;}
+   }

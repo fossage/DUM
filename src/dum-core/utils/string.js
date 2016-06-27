@@ -20,6 +20,11 @@ export let getParamNames = (function(){
   }
 }());
 
+export function isImageUri(str){
+  let reg = new RegExp(/(?:([^:\/?#]+):)?(?:\/\/([^\/?#]*))?([^?#]*\.(?:jpg|gif|png))(?:\?([^#]*))?(?:#(.*))?/, 'i');
+  return str.match(reg);
+}
+
 export function assembleUrl(url, params, queryParams) {
   let splitPath = url.split('/');
   let paramKeys = Object.keys(params);

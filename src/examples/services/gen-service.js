@@ -1,5 +1,4 @@
 'use strict';
-
 import {DUM} from '../../dum-core/dum';
 
 export const Gen = DUM.Service('Gen', {});
@@ -42,6 +41,37 @@ Object.defineProperties(Gen, {
           return Promise.reject(new Error(`Invalid yield ${val}`));
         }
       }); 
+    }
+  },
+
+  Listener: {
+    value: function* (cb) {
+      while(true) {
+        yield cb;
+      }
+    }
+  },
+
+  Notifier: {
+    value: (fn) => {
+      return { notify: fn }
+    } 
+  },
+
+  bindData: {
+    value: (listener, notifier) => {
+      let genListener = Gen.Listener(listener);
+      
+      let originalFunc = notifier.notify;
+
+      notifier.notify = new Proxy(originalFunc, {
+        apply: (target, thisArg, argumentsList) => {
+          let updatedData = target.apply(thisArg, argumentsList);
+          let a = genListener.next().value(updatedData);
+          return updatedData
+        }
+      });
+      
     }
   }
 });

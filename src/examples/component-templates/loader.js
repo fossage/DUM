@@ -45,7 +45,7 @@ export let Loader = DUM.Component((options) => {
     })
     .subscribe('loaderStop', () => {
       wrapper.removeClass('active');
-    })
+    });
 
     return wrapper;
   } else {

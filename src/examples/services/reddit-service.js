@@ -1,6 +1,7 @@
 import {HTTP} from './http-service';
+import {decodeEntities} from '../../dum-core/utils/element';
 import {DUM} from '../../dum-core/dum';
-import {StateManager} from './state-manager-service'
+import {StateManager} from './state-manager-service';
 
 const REDDITUSERAGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2728.0 Safari/537.36:dum.demo:v0.0.1 (by /u/fossage)';
 
@@ -56,34 +57,25 @@ Object.defineProperties(Reddit, {
         auth: {bearer: Reddit._credentials.access_token}
       };
 
-      var decodeEntities = (function() {
-        // this prevents any overhead from creating the object each time
-        var element = document.createElement('div');
-
-        function decodeHTMLEntities (str) {
-          if(str && typeof str === 'string') {
-            // strip script/html tags
-            str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gmi, '');
-            str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gmi, '');
-            element.innerHTML = str;
-            str = element.textContent;
-            element.textContent = '';
-          }
-
-          return str;
-        }
-
-        return decodeHTMLEntities;
-      })();
+      
 
       let raw = decodeEntities(url);
 
       return fetch(raw, initializer)
       .then((response) => {
-        return response.blob()
+        let method;
+        let type = response.headers.get('content-type');
+        if(type === 'text/html; charset=utf-8') {
+          method = 'text';
+        } else {
+          method = 'blob';
+        }
+
+        return response[method]()
         .then((data) => {
           DUM.publish('loaderStop');
-          return URL.createObjectURL(data);
+          if(typeof data === 'string') return {type: 'string', data: data}
+          return {type: 'image', data: URL.createObjectURL(data)};
         });
       });
     })

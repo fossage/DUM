@@ -1,20 +1,22 @@
-import {DUM} from '../../dum-core/dum';
-import {Reddit} from '../services/reddit-service';
-import {Gen} from '../services/gen-service';
-import {List} from '../component-templates/list';
-import {SlideOpen} from '../component-templates/slide-open';
-import {Select} from '../component-templates/select';
+import {DUM}              from '../../dum-core/dum';
+import {Gen}              from '../services/gen-service';
+import {List}             from '../component-templates/list';
+import {Reddit}           from '../services/reddit-service';
+import {Select}           from '../component-templates/select';
+import {SlideOpen}        from '../component-templates/slide-open';
+import {decodeEntities}   from '../../dum-core/utils/element';
+import {isImageUri}       from '../../dum-core/utils/string';
 import {Col12, Col4, Row} from '../component-templates/grid';
 
 export const reddit = DUM.Component((options = {}) => {
-  
+  let list         = null;
+  let after        = '';
+  let lastReddit   = null;
   let responseType = '';
-  let after = '';
 
   /*=========================================== 
                   ELEMENT SETUP
   ============================================*/
-
   /*======= Input Field =======*/
   let inputElement = DUM
   .input
@@ -61,14 +63,13 @@ export const reddit = DUM.Component((options = {}) => {
     )
   );
 
-  /*=========================================== 
-                     ASSEMBLY
-  ============================================*/
+  /*=========== ASSEMBLY ===========*/
   let container = DUM
     .div
     .append(inputSection)
     .setClass('container');
-  
+
+
   /*=========================================== 
                   INITIALIZATION
   ============================================*/
@@ -76,32 +77,102 @@ export const reddit = DUM.Component((options = {}) => {
     let subName = options.sub || 'all';
     yield Reddit.authorize();
     let response = yield _getSubreddit(subName);
-    console.log(response)
     after = response.data.after;
-    yield _constructList.bind(null, response, subName);
+    return _constructList(response, subName);
   })
-  .catch((e) => {
-    console.log(e);
-  });
+  .catch(e => console.log(e));
 
+  
   /*=========================================== 
-                PRIVATE FUNCTIONS
+                HELPER FUNCTIONS
   ============================================*/
-  let list = null;
-  let lastReddit = null;
-  
-  
-  function _slideNotify() {
-    let currentVal = true;
-    let genr;
+  function _itemTemplate(item, idx, length) {
+    // ELEMENT SETUP
+    let _slideNotify       = _notifierFactory();
+    let imgContainer       = DUM.div;
+    let isDefaultThumbnail = (item.data.thumbnail !== 'default' && item.data.thumbnail !== 'self');
+    let thumbnail          = isDefaultThumbnail ? item.data.thumbnail : 'http://66.media.tumblr.com/avatar_afef10890beb_128.png';
+    let slideIsOpen        = false;
+    let slide              = SlideOpen({ notifier: _slideNotify, template: () => imgContainer });
+    let titleEl            = DUM.a.attr('target', '_blank');
     
-    return (gen) => {
-      if(gen) genr = gen;
-      currentVal = !currentVal;
-      genr.next(currentVal);
+    let observable = DUM.observe(item.data, {
+      title: (newVal, oldVal) => titleEl.text(newVal)
+    });
+
+    titleEl
+    .text(observable.title)
+    .setHref(observable.url);
+
+    setTimeout(() => {
+      observable.title = Math.random() * 100;
+    }, 1000)
+
+    // MAIN ELEMENT CONSTRUCTION
+    let li = DUM.li.setClass('collection-item', 'avatar').append(
+      DUM.img.setClass('circle').setSrc(thumbnail),
+      titleEl,
+      DUM.p.append(
+        DUM.span.append(DUM.i.setClass('material-icons').text('thumb_up').setStyles({color: '#4db6ac'})),
+        DUM.span.text(observable.ups)
+      ),
+      slide
+    )
+    .click(_handleClick)
+
+
+    // Attatch inView handler to last item in the list for 
+    // infinite scrolling
+    if(idx === length -1) {
+      let onInViewOpts = {
+        cb: _onInView,
+        offset: 20,
+        once: true
+      };
+
+      li.behavior('onInView', onInViewOpts);
     }
+
+    function _handleClick(){
+      let iframe = item.data.media_embed
+      if(iframe && iframe.content) {
+        slideIsOpen 
+          ? _emptyAfter(imgContainer, 300) 
+          : imgContainer.innerHTML = decodeEntities(iframe.content);
+        
+        slideIsOpen = _slideNotify.notify();
+      } else {
+        let previewSrcs = item.data.preview.images[0].resolutions;
+        let previewUrl  = previewSrcs[previewSrcs.length - 1].url
+        let originalUrl = item.data.url;
+        let src         = originalUrl && isImageUri(originalUrl) ? originalUrl : previewUrl;
+        
+        if(slideIsOpen) {
+          _emptyAfter(imgContainer, 300);
+          slideIsOpen = _slideNotify.notify();
+        } else {
+          Reddit.getImage(src)
+          .then((src) => {
+            src.type === 'string' 
+              ? imgContainer.innerHTML = src.data 
+              : imgContainer.append(DUM.img.setSrc(src.data));
+            
+            slideIsOpen = _slideNotify.notify();   
+          });
+        }
+      }
+    }
+    
+    function _emptyAfter(el, time) {
+      el
+      .wait(time)
+      .then(() => {
+        el.empty();
+      }); 
+    }
+    return li;
   }
-  
+
   function _getSubreddit(subName) {
     if(list) list.empty();
     lastReddit = {subReddit: subName, type: responseType, queryParams: {limit: 20}};
@@ -121,64 +192,35 @@ export const reddit = DUM.Component((options = {}) => {
     container.append(list);
   }
 
-  function _itemTemplate(item, idx, length) {
-    let img = DUM.img;
-    let thumbnail = item.data.thumbnail !== 'default' && item.data.thumbnail !== 'self' ? item.data.thumbnail : 'http://66.media.tumblr.com/avatar_afef10890beb_128.png';
-    let notifier = _slideNotify();
-    let slide = SlideOpen({
-      notifier: notifier,
-      template: slideTemplate
-    });
-
-
-    function slideTemplate() {
-      return img;
-    }
-    
-    let li = DUM.li.setClass('collection-item', 'avatar').append(
-      DUM.img.setClass('circle').setSrc(thumbnail),
-      DUM.a.text(item.data.title).setHref(item.data.url).attr('target', '_blank'),
-      DUM.p.append(
-        DUM.span.append(DUM.i.setClass('material-icons').text('thumb_up').setStyles({color: '#4db6ac'})),
-        DUM.span.text(item.data.ups)
-      ),
-      slide
-    )
-    .click(() => {
-      let srcs = item.data.preview.images[0].resolutions;
-      Reddit.getImage(srcs[srcs.length - 1].url)
-      .then((src) => {
-        img.setSrc(src);
-        notifier();
-      })
-    })
-
-    if(idx === length -1) {
-      li.behavior('onInView', {
-        cb: (val) => { 
-          lastReddit.queryParams = {after: after, limit: 20};
-          
-          Reddit.get(lastReddit)
-          .then((res) => {
-            after = res.data.after;
-            
-            res.data.children.forEach((itm, i) => {
-              list.append(_itemTemplate(itm, i, res.data.children.length))
-            });
-          })
-          .catch(e => console.log(e)); 
-        },
-        offset: 20,
-        once: true
-      });
-    }
-    return li;
+  function _notifierFactory() {
+    return Gen.Notifier((function(){
+      let val = false;
+      
+      return () => {
+        val = !val;
+        return val;
+      }
+    }()));
   }
-  
+
+  function _onInView(val){ 
+    lastReddit.queryParams = {after: after, limit: 20};
+    
+    Reddit.get(lastReddit)
+    .then((res) => {
+      after = res.data.after;
+      
+      res.data.children.forEach((itm, i) => {
+        list.append(_itemTemplate(itm, i, res.data.children.length))
+      });
+    })
+    .catch(e => console.log(e)); 
+  }
+
   function* _subThenList(val){
     let res = yield  _getSubreddit(val);
-    after = res.data.after;
-    yield _constructList.bind(null, res, val);
+    after   = res.data.after;
+    return _constructList(res, val);
   }
 
   return container;
